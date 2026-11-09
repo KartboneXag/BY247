@@ -1,0 +1,13 @@
+{
+  "name": "Studio Fripe — By 247",
+  "short_name": "Studio Fripe",
+  "description": "Vos annonces Vinted en quelques secondes à partir de vos photos.",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAFB",
+  "theme_color": "#B4471E",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

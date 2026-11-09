@@ -1,0 +1,13 @@
+{
+  "name": "studio-fripe",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Studio Fripe — By 247 : annonces Vinted en quelques secondes à partir de photos (Gemini).",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^4.0.0"
+  }
+}
