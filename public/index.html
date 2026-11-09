@@ -144,6 +144,14 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
 .spin{width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.spin,.gen{animation:none}.toast{transition:none}}
+/* access code screen */
+.gate{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:var(--base)}
+.gate .card{width:100%;max-width:380px;border-radius:28px;padding:28px 22px;display:flex;flex-direction:column;gap:14px;text-align:center}
+.gate h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.gate p{margin:0;color:var(--muted);font-size:14px}
+.gate input{width:100%;font:600 18px var(--sans);text-align:center;letter-spacing:.08em;padding:13px 16px;border-radius:30px;border:1px solid var(--hair);background:var(--glass-2);color:var(--ink)}
+.gate input:focus-visible{outline:2px solid var(--rust);outline-offset:2px}
+.gate .msg{min-height:20px;color:var(--warn);font-size:14px;font-weight:600}
 </style>
 </head>
 <body>
@@ -157,6 +165,15 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
   <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
 </svg>
 <div class="aura" aria-hidden="true"></div>
+<div class="gate" id="gate" hidden>
+  <form class="card glass" id="gateForm" autocomplete="off">
+    <h2>Studio Fripe</h2>
+    <p>Saisissez le code d’accès qui vous a été donné.</p>
+    <input id="gateCode" type="password" aria-label="Code d’accès" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+    <div class="msg" id="gateMsg" role="alert"></div>
+    <button class="btn" type="submit" id="gateGo">Entrer</button>
+  </form>
+</div>
 
 <div class="gut">
   <div class="top">
@@ -520,10 +537,26 @@ function str(v){if(v==null)return null;if(Array.isArray(v))v=v.filter(Boolean).j
 function pick(o,...keys){for(const k of keys){const v=str(o&&o[k]);if(v)return v}return null}
 
 function b64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(blob)})}
-async function api(path,body){
-  let r;try{r=await fetch(path,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)})}catch(e){throw {code:"network"}}
+const CODE_KEY="studio-fripe-code";let codeMem="";
+function getCode(){try{return localStorage.getItem(CODE_KEY)||codeMem}catch(e){return codeMem}}
+function setCode(c){codeMem=c;try{c?localStorage.setItem(CODE_KEY,c):localStorage.removeItem(CODE_KEY)}catch(e){}}
+async function post(path,body,code){
+  let r;try{r=await fetch(path,{method:"POST",headers:{"content-type":"application/json","x-access-code":code},body:JSON.stringify(body)})}catch(e){throw {code:"network"}}
   const j=await r.json().catch(()=>({}));if(!r.ok)throw {code:j.code||(r.status===429?"rate_limited":r.status===413?"too_big":"server"),message:j.error};return j;
 }
+async function api(path,body){
+  try{return await post(path,body,getCode())}
+  catch(e){if(e&&e.code==="bad_code"){setCode("");showGate("Le code d’accès a changé. Saisissez le nouveau code.")}throw e}
+}
+function showGate(msg){$("#gate").hidden=false;$("#gateMsg").textContent=msg||"";setTimeout(()=>$("#gateCode").focus(),50)}
+$("#gateForm").addEventListener("submit",async ev=>{
+  ev.preventDefault();const code=$("#gateCode").value.trim(),go=$("#gateGo");if(!code)return;
+  go.disabled=true;$("#gateMsg").textContent="";
+  try{await post("/api/access",{},code);setCode(code);$("#gate").hidden=true;$("#gateCode").value=""}
+  catch(e){$("#gateMsg").textContent=e&&e.code==="bad_code"?"Code incorrect.":errMsg(e,"Vérification impossible. Réessayez.")}
+  finally{go.disabled=false}
+});
+if(!getCode())showGate();
 const sample={json:async(prompt,{images})=>(await api("/api/analyse",{prompt,images:await Promise.all(images.map(b64))})).result};
 const caps={images:{maxCount:8}};
 
@@ -538,7 +571,7 @@ async function genShot(key){
 }
 function genStudio(){["face","dos","porte-"+mannequin].forEach(k=>{if(k!=="dos"||photos.dos)genShot(k)})}
 function errMsg(e,fallback){
-  const m={no_key:"La clé Gemini n'est pas encore configurée sur le serveur (variable GEMINI_API_KEY dans Netlify).",bad_key:"La clé Gemini est refusée. Vérifiez-la dans Netlify.",network:"Pas de connexion. Vérifiez votre réseau et relancez.",rate_limited:"Trop de demandes d'un coup. Réessayez dans une minute.",quota:"Le quota Gemini est épuisé ou la facturation n'est pas activée sur votre clé.",blocked:"Gemini a refusé cette image. Essayez une autre photo.",invalid_json:"La réponse n'a pas pu être lue. Relancez l'analyse.",too_big:"Photos trop lourdes. Retirez-en une ou deux et relancez."};
+  const m={no_key:"La clé Gemini n'est pas encore configurée sur le serveur (variable GEMINI_API_KEY dans Netlify).",bad_key:"La clé Gemini est refusée. Vérifiez-la dans Netlify.",network:"Pas de connexion. Vérifiez votre réseau et relancez.",rate_limited:"Trop de demandes d'un coup. Réessayez dans une minute.",quota:"Le quota Gemini est épuisé ou la facturation n'est pas activée sur votre clé.",blocked:"Gemini a refusé cette image. Essayez une autre photo.",invalid_json:"La réponse n'a pas pu être lue. Relancez l'analyse.",too_big:"Photos trop lourdes. Retirez-en une ou deux et relancez.",bad_code:"Code d’accès incorrect ou modifié.",no_code:"Le code d’accès n’est pas encore configuré sur le serveur (variable ACCESS_CODE dans Netlify)."};
   return m[e&&e.code]||(e&&e.message)||fallback;
 }
 

@@ -18,6 +18,7 @@ netlify.toml            configuration Netlify
 | Variable | Obligatoire | Rôle |
 |---|---|---|
 | `GEMINI_API_KEY` | oui | Clé API Google AI Studio (portée : Functions) |
+| `ACCESS_CODE` | oui | Code d'accès demandé à l'ouverture de l'appli ; sans lui, l'API refuse tout |
 | `GEMINI_TEXT_MODEL` | non | Modèle texte, défaut `gemini-2.5-flash` |
 | `GEMINI_IMAGE_MODEL` | non | Modèle image, défaut `gemini-2.5-flash-image` |
 

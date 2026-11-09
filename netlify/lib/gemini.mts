@@ -20,8 +20,25 @@ export function fail(e: unknown) {
   return Response.json({ code: "server", error: "Erreur interne du serveur." }, { status: 500 })
 }
 
+// Access code: every API call must send the code set in the ACCESS_CODE env var
+// (header x-access-code). Without ACCESS_CODE configured, the API stays closed.
+function sameText(a: string, b: string) {
+  if (a.length !== b.length) return false
+  let diff = 0
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  return diff === 0
+}
+
+export function checkAccess(req: Request) {
+  const code = (Netlify.env.get("ACCESS_CODE") || "").trim()
+  if (!code) throw new ApiError("no_code", "Le code d'accès n'est pas configuré sur le serveur.", 503)
+  const sent = (req.headers.get("x-access-code") || "").trim()
+  if (!sameText(sent.toLowerCase(), code.toLowerCase())) throw new ApiError("bad_code", "Code d'accès incorrect.", 401)
+}
+
 export async function readJson(req: Request) {
   if (req.method !== "POST") throw new ApiError("method", "Méthode non autorisée.", 405)
+  checkAccess(req)
   try {
     return await req.json()
   } catch {
