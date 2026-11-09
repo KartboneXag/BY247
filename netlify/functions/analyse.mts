@@ -1,11 +1,14 @@
 import type { Config } from "@netlify/functions"
 import { ApiError, TEXT_MODEL, callGemini, fail, inlineImage, parts, readJson } from "../lib/gemini.mts"
+import { useTicket, whoIs } from "../lib/store.mts"
 
 // POST /api/analyse  { prompt: string, images: string[] (base64 JPEG) }
 // → { result: object }  (the JSON the prompt asked Gemini for)
+// Exige un code vendeur (x-access-code) et un ticket d'annonce (x-ticket) : sans crédit, rien ne part chez Gemini.
 export default async (req: Request) => {
   try {
     const { prompt, images } = await readJson(req)
+    await useTicket(req, await whoIs(req))
     if (typeof prompt !== "string" || !prompt.trim()) throw new ApiError("bad_request", "Consigne manquante.", 400)
     const imgs: string[] = Array.isArray(images) ? images.slice(0, 8) : []
     if (!imgs.length) throw new ApiError("bad_request", "Aucune photo reçue.", 400)

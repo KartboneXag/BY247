@@ -1,5 +1,6 @@
 import type { Config } from "@netlify/functions"
 import { ApiError, IMAGE_MODEL, callGemini, fail, inlineImage, parts, readJson } from "../lib/gemini.mts"
+import { refundPhotoCredit, takePhotoCredit, whoIs } from "../lib/store.mts"
 
 // POST /api/photo
 // { kind: "cintre"|"porte", vue: "face"|"dos", mannequin?: "femme"|"homme"|"fille"|"garcon",
@@ -17,11 +18,12 @@ const WHO: Record<string, string> = {
 // Public Gemini API prices (USD per 1M tokens, paid tier) used to estimate each image's cost.
 // Output images are billed as tokens (≈1,290 tokens per 1024px image for Flash Image).
 const PRICES: Record<string, { in: number; out: number }> = {
+  "gemini-3.1-flash-image": { in: 0.5, out: 60 },
   "gemini-2.5-flash-image": { in: 0.3, out: 30 },
   "gemini-3-pro-image": { in: 2, out: 120 },
 }
 function costUsd(model: string, usage: any) {
-  const key = Object.keys(PRICES).find((k) => model.startsWith(k)) || "gemini-2.5-flash-image"
+  const key = Object.keys(PRICES).find((k) => model.startsWith(k)) || "gemini-3.1-flash-image"
   const p = PRICES[key]
   const inTok = Number(usage?.promptTokenCount) || 0
   const outTok = Number(usage?.candidatesTokenCount) || 1290
@@ -104,19 +106,27 @@ export default async (req: Request) => {
     const prompt = fix ? buildFixPrompt(body) : buildPrompt(body)
     const images = fix ? [inlineImage(body.image), inlineImage(body.previous)] : [inlineImage(body.image)]
 
-    const model = IMAGE_MODEL()
-    const json = await callGemini(model, {
-      contents: [{ role: "user", parts: [...images, { text: prompt }] }],
-      generationConfig: { responseModalities: ["IMAGE"], temperature: 0.3 },
-    })
+    // Une photo IA est payante : elle consomme un crédit photo, remboursé si Gemini échoue.
+    const w = await whoIs(req)
+    const restant = await takePhotoCredit(w)
+    try {
+      const model = IMAGE_MODEL()
+      const json = await callGemini(model, {
+        contents: [{ role: "user", parts: [...images, { text: prompt }] }],
+        generationConfig: { responseModalities: ["IMAGE"], temperature: 0.3 },
+      })
 
-    const img = parts(json).find((p: any) => p.inlineData?.data || p.inline_data?.data)
-    const d = img?.inlineData || img?.inline_data
-    if (!d) {
-      const reason = json?.candidates?.[0]?.finishReason
-      throw new ApiError(reason && reason !== "STOP" ? "blocked" : "gemini", "Gemini n'a pas renvoyé d'image.", 502)
+      const img = parts(json).find((p: any) => p.inlineData?.data || p.inline_data?.data)
+      const d = img?.inlineData || img?.inline_data
+      if (!d) {
+        const reason = json?.candidates?.[0]?.finishReason
+        throw new ApiError(reason && reason !== "STOP" ? "blocked" : "gemini", "Gemini n'a pas renvoyé d'image.", 502)
+      }
+      return Response.json({ mime: d.mimeType || d.mime_type || "image/png", data: d.data, cost: costUsd(model, json?.usageMetadata), photosIA: restant })
+    } catch (e) {
+      await refundPhotoCredit(w)
+      throw e
     }
-    return Response.json({ mime: d.mimeType || d.mime_type || "image/png", data: d.data, cost: costUsd(model, json?.usageMetadata) })
   } catch (e) {
     return fail(e)
   }

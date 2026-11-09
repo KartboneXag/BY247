@@ -135,7 +135,7 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .rule{font-size:14px;color:var(--muted);margin:0}
 /* floating glass tab bar */
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(420px,calc(100% - 40px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));border-radius:40px;display:grid;grid-template-columns:repeat(4,1fr);padding:6px;z-index:15}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100% - 40px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));border-radius:40px;display:grid;grid-template-columns:repeat(5,1fr);padding:6px;z-index:15}
 .nav a{display:grid;place-items:center;height:54px;border-radius:30px;color:var(--ink)}
 .nav a svg{width:27px;height:27px}
 .nav a.on{background:color-mix(in srgb,var(--a4) 55%,transparent);color:var(--ink)}
@@ -162,6 +162,52 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
 .gate input{width:100%;font:600 18px var(--sans);text-align:center;letter-spacing:.08em;padding:13px 16px;border-radius:30px;border:1px solid var(--hair);background:var(--glass-2);color:var(--ink)}
 .gate input:focus-visible{outline:2px solid var(--rust);outline-offset:2px}
 .gate .msg{min-height:20px;color:var(--warn);font-size:14px;font-weight:600}
+/* contrôle photo */
+.slot .qwarn{position:absolute;left:6px;top:6px;z-index:2;background:var(--warn);color:#fff;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;max-width:calc(100% - 40px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* mode lot */
+.lotbtn{flex:none;border:1px solid var(--hair);background:var(--glass-2);color:var(--ink);font:700 13px var(--sans);padding:9px 12px;border-radius:30px;cursor:pointer}
+.lotbtn[aria-pressed="true"]{background:var(--rust);color:var(--rust-ink);border-color:var(--rust)}
+.lot{border-radius:24px;padding:14px;margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.lot h3{margin:0;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lotlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.lotlist li{display:flex;align-items:center;gap:10px;padding:8px;border-radius:16px;background:var(--glass-2);border:1px solid var(--hair)}
+.lotlist img,.hist img{flex:none;width:48px;height:48px;border-radius:12px;object-fit:cover;background:var(--hair)}
+.lotlist .txt{flex:1;min-width:0;font-size:14px;font-weight:600}
+.lotlist .txt small{display:block;font-weight:500;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lotlist .err small{color:var(--warn)}
+.lotlist .ok small{color:var(--ok)}
+/* prix */
+.prix{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.prix div{padding:10px;border-radius:16px;background:var(--glass-2);border:1px solid var(--hair);text-align:center}
+.prix .k{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.prix input{text-align:center;font-weight:800!important;font-size:20px!important;padding:6px!important;margin-top:4px}
+.prix .plancher{border-color:var(--rust)}
+.prix .v{font-weight:800;font-size:20px;margin-top:4px;display:block}
+.prixnote{font-size:14px;color:var(--muted);margin:0}
+.prixnote.err{color:var(--warn)}
+.srcs{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.srcs a{font-size:12.5px;color:var(--ink);background:var(--glass-2);border:1px solid var(--hair);border-radius:20px;padding:3px 10px;text-decoration:none}
+.comp{margin:0;padding-left:18px;font-size:14px;color:var(--muted)}
+/* historique */
+.tot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tot div{padding:10px;border-radius:16px;background:var(--glass-2);border:1px solid var(--hair);text-align:center;font-size:12px;color:var(--muted);font-weight:600}
+.tot b{display:block;font-size:20px;color:var(--ink)}
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.hist li{display:grid;grid-template-columns:48px 1fr;gap:10px;padding:10px;border-radius:18px;background:var(--glass-2);border:1px solid var(--hair)}
+.hist .t{font-weight:700;font-size:15px;overflow-wrap:anywhere}
+.hist .m{font-size:13px;color:var(--muted)}
+.hist .ctl{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hist select,.hist input{font:600 14px var(--sans);color:var(--ink);background:var(--glass);border:1px solid var(--hair);border-radius:12px;padding:7px 10px}
+.hist input{width:90px}
+.hist .vendu{color:var(--ok)}
+.empty{color:var(--muted);font-size:15px;text-align:center;padding:12px}
+/* demande de crédits */
+dialog.ask{border:0;border-radius:28px;padding:22px;width:min(380px,calc(100% - 32px));color:var(--ink)}
+dialog.ask::backdrop{background:rgba(10,10,20,.45)}
+dialog.ask form{display:flex;flex-direction:column;gap:12px}
+dialog.ask h2{font-size:20px}
+dialog.ask input,dialog.ask textarea{font:16px var(--sans);color:var(--ink);background:var(--glass-2);border:1px solid var(--hair);border-radius:14px;padding:10px;width:100%}
+.adminlink{color:var(--rust);font-weight:700;text-decoration:none;margin-left:4px}
 </style>
 </head>
 <body>
@@ -172,14 +218,15 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
   <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10l-5 4z"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></symbol>
   <symbol id="i-updown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
 </svg>
 <div class="aura" aria-hidden="true"></div>
 <div class="gate" id="gate" hidden>
   <form class="card glass" id="gateForm" autocomplete="off">
     <h2>Studio Fripe</h2>
-    <p>Saisissez le code d’accès qui vous a été donné.</p>
-    <input id="gateCode" type="password" aria-label="Code d’accès" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+    <p>Saisissez votre code vendeur (ex. SF-ABCD-EFGH). Pas encore de code ? Demandez-le à Studio Fripe.</p>
+    <input id="gateCode" type="password" aria-label="Code vendeur" autocapitalize="off" autocorrect="off" spellcheck="false" required>
     <div class="msg" id="gateMsg" role="alert"></div>
     <button class="btn" type="submit" id="gateGo">Entrer</button>
   </form>
@@ -189,9 +236,9 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
   <div class="top">
     <div class="ws glass"><svg class="mark" viewBox="0 0 64 48" role="img" aria-label="Logo Studio Fripe"><g fill="none" stroke="var(--rust)" stroke-linecap="round" stroke-linejoin="round"><path d="M32 17.5v-2.2c0-2.6 5.4-3.4 5.4-8.1a5.4 5.4 0 0 0-10.8 0" stroke-width="3.6"/><path d="M32 18.5 7.5 32.2c-3.6 2-2.2 7.3 1.9 7.3h45.2c4.1 0 5.5-5.3 1.9-7.3Z" stroke-width="4.4"/></g><circle cx="32" cy="31.5" r="10.2" fill="var(--rust)"/><circle cx="32" cy="31.5" r="6.8" fill="#fff"/><circle cx="32" cy="31.5" r="4.9" fill="var(--rust)"/><circle cx="34.6" cy="28.9" r="1.5" fill="#fff"/><circle cx="39.6" cy="25.2" r="1.3" fill="#fff"/></svg><span class="word"><b>Studio Fripe</b><small>By 247</small></span></div>
     <div class="topr"><button class="btn sm newad" id="newAd" type="button"><svg aria-hidden="true"><use href="#i-plus"/></svg>Nouvelle<span class="lng">&nbsp;annonce</span></button>
-    <div class="av lg" title="Annonces créées ce mois" aria-label="Annonces créées ce mois">XG<span class="num" id="quota">0</span></div></div>
+    <div class="av lg" title="Annonces restantes" aria-label="Annonces restantes"><span id="avTxt">SF</span><span class="num" id="quota">0</span></div></div>
   </div>
-  <div class="spend" id="spend" title="Coût estimé des images générées par Gemini sur cet appareil, au tarif public de Google"><span class="glass">Images IA : <b id="spendN">0</b> · coût cumulé <b id="spendAmt">≈ 0,00 $</b></span></div>
+  <div class="spend" id="spend" hidden title="Coût estimé des images générées par Gemini sur cet appareil, au tarif public de Google"><span class="glass">Images IA : <b id="spendN">0</b> · coût cumulé <b id="spendAmt">≈ 0,00 $</b></span></div>
 
   <section id="photos" aria-labelledby="h-hero">
     <div class="hero">
@@ -204,9 +251,15 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
       <div class="slots" id="slots"></div>
       <div class="bar">
         <button class="iconbtn" id="reset" title="Nouvelle annonce" aria-label="Nouvelle annonce"><svg><use href="#i-plus"/></svg></button>
-        <div class="quota" id="quotaTxt">0 annonce sur 5 gratuites ce mois</div>
+        <button class="lotbtn" id="lotBtn" type="button" aria-pressed="false" title="Photographier plusieurs articles d'affilée, puis tout traiter d'un coup">Mode lot</button>
+        <div class="quota" id="quotaTxt"></div>
         <button class="go" id="go" disabled>Créer l'annonce</button>
       </div>
+    </div>
+    <div class="lot glass" id="lot" hidden>
+      <h3><span id="lotTitle">Lot : 0 article</span><button class="btn sm" id="lotRun" type="button" disabled>Lancer le lot</button></h3>
+      <p class="hint" id="lotHint">Ajoutez les photos d'un article puis « Ajouter au lot ». Recommencez pour chaque article, puis lancez : les annonces se préparent toutes seules (1 annonce par article).</p>
+      <ul class="lotlist" id="lotList"></ul>
     </div>
     <div class="status" id="status" role="status"></div>
   </section>
@@ -222,7 +275,7 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
   <section id="studio" class="panel glass" aria-labelledby="h-studio">
     <h2 id="h-studio">Studio</h2>
     <p class="hint">Photo 1 = la vraie photo. Les photos « Studio IA » sont générées par Gemini (cintre, porté) : vérifiez toujours que couleur, logo et défauts sont fidèles avant de publier.</p>
-    <div class="row"><button class="btn ghost sm" id="regen" type="button">Regénérer les photos studio IA</button></div>
+    <div class="row"><button class="btn ghost sm" id="regen" type="button">Générer les photos studio IA</button></div>
     <div class="gallery" id="gallery"></div>
     <h3>Porté sur mannequin</h3>
     <div class="seg" id="zone" role="group" aria-label="Type de vêtement">
@@ -238,6 +291,10 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
     <label class="f" for="d">Description</label>
     <textarea id="d"></textarea>
     <div class="duo">
+      <label class="f">Marque<input id="marque" autocomplete="off"></label>
+      <label class="f">Taille<input id="taille" autocomplete="off"></label>
+    </div>
+    <div class="duo">
       <label class="f">Catégorie<input id="cat"></label>
       <label class="f">État
         <select id="etat">
@@ -245,12 +302,33 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
         </select>
       </label>
     </div>
+    <h3>Prix <span class="badge" id="prixSrc" hidden></span></h3>
+    <div class="prix" id="prix">
+      <div><span class="k">Conseillé</span><input id="pc" type="number" min="1" step="1" inputmode="numeric" aria-label="Prix conseillé en euros"></div>
+      <div class="plancher"><span class="k">Plancher</span><input id="pp" type="number" min="1" step="1" inputmode="numeric" aria-label="Prix plancher en euros"></div>
+      <div><span class="k">Haut</span><span class="v" id="ph">—</span></div>
+    </div>
+    <p class="prixnote" id="prixNote">Le prix est recherché sur le web après l'analyse. Plancher = n'acceptez pas d'offre en dessous.</p>
+    <ul class="comp" id="prixComp"></ul>
+    <ul class="srcs" id="prixSrcs"></ul>
+    <div class="row"><button class="btn ghost sm" id="prixBtn" type="button">Relancer la recherche de prix</button></div>
     <button class="btn" id="copyAll">Copier l'annonce</button>
     <div class="row">
       <button class="btn ghost sm" id="copyT">Copier le titre</button>
       <button class="btn ghost sm" id="copyD">Copier la description</button>
+      <button class="btn ghost sm" id="copyM">Copier la marque</button>
+      <button class="btn ghost sm" id="saveAd">Enregistrer dans l'historique</button>
     </div>
     <p class="rule">Règle de la maison : on ne cache jamais un défaut et on ne change jamais la couleur réelle.</p>
+  </section>
+
+  <section id="historique" class="panel glass" aria-labelledby="h-hist">
+    <h2 id="h-hist">Mes annonces</h2>
+    <div class="tot"><div><b id="totN">0</b>annonces</div><div><b id="totV">0</b>vendues</div><div><b id="totE">0 €</b>gagnés</div></div>
+    <div class="seg" id="histFilter" role="group" aria-label="Filtrer les annonces">
+      <button type="button" data-f="tout" aria-pressed="true">Toutes</button><button type="button" data-f="brouillon" aria-pressed="false">Brouillons</button><button type="button" data-f="en_ligne" aria-pressed="false">En ligne</button><button type="button" data-f="vendu" aria-pressed="false">Vendues</button>
+    </div>
+    <ul class="hist" id="histList"><li class="empty">Vos annonces apparaîtront ici.</li></ul>
   </section>
   </main>
 </div>
@@ -260,8 +338,19 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
   <a href="#etiquette" title="Étiquette" aria-label="Étiquette"><svg><use href="#i-tag"/></svg></a>
   <a href="#studio" title="Studio" aria-label="Studio"><svg><use href="#i-hanger"/></svg></a>
   <a href="#annonce" title="Annonce" aria-label="Annonce"><svg><use href="#i-doc"/></svg></a>
+  <a href="#historique" title="Mes annonces" aria-label="Mes annonces"><svg><use href="#i-list"/></svg></a>
 </nav>
 <div class="toast" id="toast"></div>
+<dialog class="ask glass" id="askDlg">
+  <form method="dialog" id="askForm">
+    <h2>Demander des crédits</h2>
+    <p class="hint">Votre demande part chez Studio Fripe. Les crédits s'ajoutent dès qu'elle est acceptée.</p>
+    <div class="duo"><label class="f">Annonces<input id="askA" type="number" min="0" max="500" value="10" inputmode="numeric"></label>
+    <label class="f">Photos studio IA<input id="askP" type="number" min="0" max="500" value="0" inputmode="numeric"></label></div>
+    <label class="f">Message (facultatif)<textarea id="askM" rows="2" maxlength="300"></textarea></label>
+    <div class="row"><button class="btn" id="askGo" value="send">Envoyer la demande</button><button class="btn ghost" value="cancel" formnovalidate>Annuler</button></div>
+  </form>
+</dialog>
 
 <script>
 (function(){
@@ -280,10 +369,19 @@ const EXAMPLE={
 };
 
 /* ---------- storage helpers ---------- */
-function monthKey(){const d=new Date();return "sf-count-"+d.getFullYear()+"-"+(d.getMonth()+1)}
-function getCount(){try{return +localStorage.getItem(monthKey())||0}catch(e){return 0}}
-function bumpCount(){try{localStorage.setItem(monthKey(),getCount()+1)}catch(e){} renderQuota()}
-function renderQuota(){const c=getCount();$("#quota").textContent=Math.min(c,99);$("#quotaTxt").textContent=c+(c>1?" annonces":" annonce")+" sur 5 gratuites ce mois"+(c>=5?" · limite atteinte":"")}
+/* crédits : la vérité est sur le serveur (code vendeur → annonces et photos IA restantes) */
+let profil=null;
+const plur=(n,w)=>n+" "+w+(n>1?"s":"");
+function initials(n){return String(n||"SF").split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase()||"SF"}
+function renderQuota(){
+  const q=$("#quota"),t=$("#quotaTxt");
+  if(!profil){q.textContent="0";t.textContent="";updateGo();return}
+  $("#avTxt").textContent=profil.admin?"XG":initials(profil.nom);
+  if(profil.admin){q.textContent="∞";t.innerHTML="Admin · illimité <a class=\"adminlink\" href=\"/admin.html\">Gérer</a>";$("#spend").hidden=false}
+  else{q.textContent=Math.min(profil.credits,99);t.textContent=plur(profil.credits,"annonce")+" · "+plur(profil.photosIA,"photo")+" IA"}
+  updateGo();
+}
+async function refreshProfil(){try{profil=await post("/api/access",{},getCode());renderQuota()}catch(e){if(e&&e.code==="bad_code"){setCode("");showGate("Ce code n’est plus valide.")}}}
 const SPEND_KEY="sf-spend";
 function getSpend(){try{return JSON.parse(localStorage.getItem(SPEND_KEY))||{usd:0,n:0}}catch(e){return {usd:0,n:0}}}
 function renderSpend(){const s=getSpend();$("#spendAmt").textContent="≈ "+s.usd.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2})+" $";$("#spendN").textContent=s.n}
@@ -303,6 +401,8 @@ function renderSlots(){
     const capTxt=s.l+(s.multi?" "+list.length+"/"+s.max:"");
     el.innerHTML=(src?`<img alt="">`:`<span class="plus">+</span>`)+`<span${src?' class="cap"':''}>${capTxt}</span>`+(s.multi&&!src?`<span style="font-weight:400;font-size:11px">jusqu'à ${s.max}</span>`:"");
     if(src) el.querySelector("img").src=src;
+    const bad=(s.multi?list:[photos[s.k]]).filter(p=>p&&p.q&&p.q.issues.length);
+    if(bad.length){const w=document.createElement("span");w.className="qwarn";w.textContent="⚠ "+bad[bad.length-1].q.issues.join(", ");w.title="Contrôle photo : "+w.textContent.slice(2)+". Reprenez la photo si possible.";el.appendChild(w)}
     if(s.multi&&has&&!full){const a=document.createElement("span");a.className="cap";a.style.cssText="left:auto;right:6px;bottom:6px";a.textContent="+ ajouter";el.appendChild(a)}
     const inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.id="in-"+s.k;inp.setAttribute("aria-label","Photo "+s.l);
     if(s.multi){inp.multiple=true;inp.disabled=full}
@@ -311,6 +411,7 @@ function renderSlots(){
       for(const f of files){
         if(s.multi&&photos[s.k].length>=s.max){toast(s.max+" photos maximum");break}
         const p=await prep(f,s.k==="etiquette");if(!p)continue;
+        if(p.q&&p.q.issues.length)toast("Photo "+s.l.toLowerCase()+" "+p.q.issues.join(" et ")+(s.k==="etiquette"?" : l'étiquette risque d'être illisible":" : reprenez-la si possible"));
         if(s.multi)photos[s.k].push(p);else{photos[s.k]=p;cutCache.delete(s.k);if(s.k==="face")for(const k in ai)delete ai[k];else delete ai.dos}
       }
       renderSlots();if(s.k==="details")renderGallery();
@@ -320,18 +421,39 @@ function renderSlots(){
       b.onclick=e=>{e.preventDefault();e.stopPropagation();if(s.multi)photos[s.k].pop();else{photos[s.k]=null;cutCache.delete(s.k)}renderSlots();if(s.k==="details")renderGallery()};el.appendChild(b)}
     box.appendChild(el);
   });
-  $("#go").disabled=!photos.face;
+  updateGo();
 }
+function photoIssues(ph){
+  const out=[];const add=(p,l)=>{if(p&&p.q&&p.q.issues.length)out.push(l+" ("+p.q.issues.join(", ")+")")};
+  add(ph.face,"face");add(ph.dos,"dos");ph.etiquette.forEach((p,i)=>add(p,"étiquette "+(i+1)));ph.details.forEach((p,i)=>add(p,"détail "+(i+1)));
+  return out;
+}
+function okToSend(ph){const b=photoIssues(ph);return !b.length||confirm("Contrôle photo : "+b.join(", ")+".\n\nGemini risque de mal lire. Continuer quand même ?")}
 
 function loadImg(url){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url})}
+/* Contrôle photo : netteté (variance du laplacien), lumière, définition. Calculé sur le téléphone, gratuit. */
+function checkPhoto(c,srcW,srcH,isLabel){
+  const k=Math.min(1,360/Math.max(c.width,c.height)),w=Math.max(8,Math.round(c.width*k)),h=Math.max(8,Math.round(c.height*k));
+  const t=document.createElement("canvas");t.width=w;t.height=h;const x=t.getContext("2d",{willReadFrequently:true});x.drawImage(c,0,0,w,h);
+  const d=x.getImageData(0,0,w,h).data,g=new Float32Array(w*h);let sum=0;
+  for(let i=0;i<w*h;i++){g[i]=.299*d[i*4]+.587*d[i*4+1]+.114*d[i*4+2];sum+=g[i]}
+  const mean=sum/(w*h);let a=0,b=0,n=0;
+  for(let y=1;y<h-1;y++)for(let X=1;X<w-1;X++){const i=y*w+X,v=4*g[i]-g[i-1]-g[i+1]-g[i-w]-g[i+w];a+=v;b+=v*v;n++}
+  const sharp=n?b/n-(a/n)*(a/n):0,issues=[];
+  if(sharp<(isLabel?140:45))issues.push("floue");
+  if(mean<60)issues.push("trop sombre");else if(mean>238)issues.push("surexposée");
+  if(Math.max(srcW,srcH)<(isLabel?900:640))issues.push("trop petite");
+  return {issues,sharp:Math.round(sharp),light:Math.round(mean)};
+}
 async function prep(file,big){
   try{
     const url0=URL.createObjectURL(file);const img=await loadImg(url0);
     const max=big?1800:1280,r=Math.min(1,max/Math.max(img.width,img.height));
     const c=document.createElement("canvas");c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);
     c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url0);
+    let q={issues:[]};try{q=checkPhoto(c,img.width,img.height,big)}catch(e){}
     const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",big?.9:.84));
-    return {blob,url:URL.createObjectURL(blob),w:c.width,h:c.height};
+    return {blob,url:URL.createObjectURL(blob),w:c.width,h:c.height,q};
   }catch(e){setStatus("Cette image n'a pas pu être lue. Essayez une photo JPEG ou PNG.",true);return null}
 }
 
@@ -464,7 +586,7 @@ function renderAd(a,isExample){
   const ul=$("#details");ul.innerHTML="";
   (a.details||[]).forEach(x=>{const li=document.createElement("li");li.innerHTML=`<i class="dot${x.defaut?" defaut":""}"></i><div><b>${esc(x.element)}</b><span>${esc(x.explication)}</span></div>`;ul.appendChild(li)});
   if(!(a.details||[]).length)ul.innerHTML=`<li><div><span>Aucun détail particulier repéré.</span></div></li>`;
-  $("#t").value=a.titre||"";$("#d").value=a.description||"";$("#cat").value=a.categorie||"";
+  $("#t").value=a.titre||"";$("#d").value=a.description||"";$("#cat").value=a.categorie||"";$("#marque").value=a.marque||"";$("#taille").value=a.taille||"";
   const sel=$("#etat");[...sel.options].forEach(o=>{if(o.text===a.etat)sel.value=o.text});
   if(!isExample&&["haut","bas","robe","long"].includes(a.zone)){zone=a.zone;syncSeg("#zone","z",zone)}
   updCount();
@@ -558,12 +680,21 @@ Les images jointes sont, dans l'ordre : IMAGES_ORDER.
 Informations lues sur l'étiquette (fiables, à reprendre telles quelles) : LABEL_JSON
 Tâches :
 1. Identifie le type de vêtement, la couleur réelle (sans l'embellir), la coupe, les détails notables (logo, boutons, capuche, poches) et TOUS les défauts visibles (taches, trous, bouloches, décolorations). Ne compte pas les plis comme un défaut.
-2. Rédige un titre vendeur de 60 caractères max : type + marque + couleur + taille.
+2. Rédige un titre vendeur de 60 caractères max : type + MARQUE + couleur + taille. Si la marque est connue, elle DOIT figurer dans le titre et dans la première phrase de la description.
 3. Rédige une description claire, honnête et chaleureuse, 600 caractères max, en paragraphes courts : présentation, détails, état (chaque défaut mentionné franchement avec sa taille et son emplacement), taille et composition reprises de l'étiquette, une ligne d'envoi. Pas d'emoji, pas de hashtags.
 4. Propose une catégorie au format Vinted (ex. « Enfants › Garçons › Sweats ») cohérente avec le rayon de l'étiquette, et un état parmi : Neuf avec étiquette, Neuf sans étiquette, Très bon état, Bon état, Satisfaisant.
 5. Indique la zone portée : "haut", "bas", "robe" ou "long", et le mannequin adapté : "homme", "femme", "fille" ou "garcon".
 Réponds uniquement en JSON :
-{"titre":string,"couleur":string,"categorie":string,"etat":string,"zone":string,"mannequin":string,"details":[{"element":string,"explication":string,"defaut":boolean}],"description":string}`;
+{"titre":string,"type":string,"couleur":string,"categorie":string,"etat":string,"zone":string,"mannequin":string,"details":[{"element":string,"explication":string,"defaut":boolean}],"description":string}`;
+/* La marque doit toujours apparaître : on la remet si Gemini l'a oubliée. */
+function withBrand(a){
+  const m=a.marque&&String(a.marque).trim();if(!m)return a;
+  const has=t=>String(t||"").toLowerCase().includes(m.toLowerCase());
+  let titre=String(a.titre||"").trim();
+  if(!has(titre)){const w=titre.split(" ");titre=w.length>1?[w[0],m,...w.slice(1)].join(" "):(titre?titre+" ":"")+m}
+  let desc=String(a.description||"").trim();if(!has(desc))desc="Marque : "+m+".\n\n"+desc;
+  return {...a,titre,description:desc};
+}
 
 function str(v){if(v==null)return null;if(Array.isArray(v))v=v.filter(Boolean).join(", ");if(typeof v==="object")v=Object.entries(v).map(([k,x])=>k+" : "+x).join(", ");v=String(v).trim();return v&&!/^(null|inconnu|non lisible|n\/a)$/i.test(v)?v:null}
 function pick(o,...keys){for(const k of keys){const v=str(o&&o[k]);if(v)return v}return null}
@@ -572,25 +703,26 @@ function b64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onl
 const CODE_KEY="studio-fripe-code";let codeMem="";
 function getCode(){try{return localStorage.getItem(CODE_KEY)||codeMem}catch(e){return codeMem}}
 function setCode(c){codeMem=c;try{c?localStorage.setItem(CODE_KEY,c):localStorage.removeItem(CODE_KEY)}catch(e){}}
-async function post(path,body,code){
-  let r;try{r=await fetch(path,{method:"POST",headers:{"content-type":"application/json","x-access-code":code},body:JSON.stringify(body)})}catch(e){throw {code:"network"}}
+async function post(path,body,code,ticket){
+  const h={"content-type":"application/json","x-access-code":code};if(ticket)h["x-ticket"]=ticket;
+  let r;try{r=await fetch(path,{method:"POST",headers:h,body:JSON.stringify(body)})}catch(e){throw {code:"network"}}
   const j=await r.json().catch(()=>({}));if(!r.ok)throw {code:j.code||(r.status===429?"rate_limited":r.status===413?"too_big":"server"),message:j.error};return j;
 }
-async function api(path,body){
-  try{return await post(path,body,getCode())}
+async function api(path,body,ticket){
+  try{return await post(path,body,getCode(),ticket)}
   catch(e){if(e&&e.code==="bad_code"){setCode("");showGate("Le code d’accès a changé. Saisissez le nouveau code.")}throw e}
 }
 function showGate(msg){$("#gate").hidden=false;$("#gateMsg").textContent=msg||"";setTimeout(()=>$("#gateCode").focus(),50)}
 $("#gateForm").addEventListener("submit",async ev=>{
   ev.preventDefault();const code=$("#gateCode").value.trim(),go=$("#gateGo");if(!code)return;
   go.disabled=true;$("#gateMsg").textContent="";
-  try{await post("/api/access",{},code);setCode(code);$("#gate").hidden=true;$("#gateCode").value=""}
+  try{profil=await post("/api/access",{},code);setCode(code);$("#gate").hidden=true;$("#gateCode").value="";renderQuota();loadHist()}
   catch(e){$("#gateMsg").textContent=e&&e.code==="bad_code"?"Code incorrect.":errMsg(e,"Vérification impossible. Réessayez.")}
   finally{go.disabled=false}
 });
 if(!getCode())showGate();
-const sample={json:async(prompt,{images})=>(await api("/api/analyse",{prompt,images:await Promise.all(images.map(b64))})).result};
-const caps={images:{maxCount:8}};
+async function ask(prompt,blobs,ticket){return (await api("/api/analyse",{prompt,images:await Promise.all(blobs.map(b64))},ticket)).result}
+const MAXIMG=8;
 
 async function toJpegB64(url){
   const i=await loadImg(url),r=Math.min(1,1280/Math.max(i.width,i.height));
@@ -607,47 +739,219 @@ async function genShot(key,fix){
     if(fix){body.fix=true;body.previous=await toJpegB64(prev.url)}
     const r=await api("/api/photo",body);
     ai[key]={url:"data:"+r.mime+";base64,"+r.data,fixed:!!fix};addSpend(r.cost);
+    if(profil&&!profil.admin&&r.photosIA!=null){profil.photosIA=r.photosIA;renderQuota()}
     if(fix)toast("Photo corrigée");
   }catch(e){ai[key]=fix?prev:null;setStatus(errMsg(e,fix?"La correction n'a pas pu être faite. L'ancienne photo reste affichée.":"La photo studio n'a pas pu être générée. L'aperçu reste affiché."),true)}
   redraw();
 }
 function genStudio(){["face","dos","porte-"+mannequin].forEach(k=>{if(k!=="dos"||photos.dos)genShot(k)})}
+const canPhotoIA=()=>profil&&(profil.admin||profil.photosIA>0);
 function errMsg(e,fallback){
-  const m={no_key:"La clé Gemini n'est pas encore configurée sur le serveur (variable GEMINI_API_KEY dans Netlify).",bad_key:"La clé Gemini est refusée. Vérifiez-la dans Netlify.",network:"Pas de connexion. Vérifiez votre réseau et relancez.",rate_limited:"Trop de demandes d'un coup. Réessayez dans une minute.",quota:"Le quota Gemini est épuisé ou la facturation n'est pas activée sur votre clé.",blocked:"Gemini a refusé cette image. Essayez une autre photo.",invalid_json:"La réponse n'a pas pu être lue. Relancez l'analyse.",too_big:"Photos trop lourdes. Retirez-en une ou deux et relancez.",bad_code:"Code d’accès incorrect ou modifié.",no_code:"Le code d’accès n’est pas encore configuré sur le serveur (variable ACCESS_CODE dans Netlify)."};
+  const m={no_key:"La clé Gemini n'est pas encore configurée sur le serveur (variable GEMINI_API_KEY dans Netlify).",bad_key:"La clé Gemini est refusée. Vérifiez-la dans Netlify.",network:"Pas de connexion. Vérifiez votre réseau et relancez.",rate_limited:"Trop de demandes d'un coup. Réessayez dans une minute.",quota:"Le quota Gemini est épuisé ou la facturation n'est pas activée sur votre clé.",blocked:"Gemini a refusé cette image. Essayez une autre photo.",invalid_json:"La réponse n'a pas pu être lue. Relancez l'analyse.",too_big:"Photos trop lourdes. Retirez-en une ou deux et relancez.",bad_code:"Code vendeur incorrect ou supprimé.",no_credit:"Plus d’annonce disponible : demandez des crédits.",no_photo_credit:"Plus de photo studio IA disponible : demandez-en.",no_ticket:"Annonce expirée ou incomplète : relancez « Créer l’annonce ».",forbidden:"Réservé à l’administrateur.",busy:"Serveur occupé, réessayez."};
   return m[e&&e.code]||(e&&e.message)||fallback;
 }
 
-async function readLabels(maxN){
-  const order=[],imgs=[];const add=(p,l)=>{if(p&&imgs.length<maxN){imgs.push(p.blob);order.push(l)}};
-  photos.etiquette.forEach((p,i)=>add(p,"gros plan d'étiquette "+(i+1)));
-  add(photos.face,"photo de face (étiquette du col parfois visible)");add(photos.dos,"photo de dos");
-  const r=await sample.json(LABEL_PROMPT.replace("IMAGES_ORDER",order.map((o,i)=>(i+1)+") "+o).join(", ")),{images:imgs,modelTier:"complex"});
+async function readLabels(ph,ticket){
+  const order=[],imgs=[];const add=(p,l)=>{if(p&&imgs.length<MAXIMG){imgs.push(p.blob);order.push(l)}};
+  ph.etiquette.forEach((p,i)=>add(p,"gros plan d'étiquette "+(i+1)));
+  add(ph.face,"photo de face (étiquette du col parfois visible)");add(ph.dos,"photo de dos");
+  const r=await ask(LABEL_PROMPT.replace("IMAGES_ORDER",order.map((o,i)=>(i+1)+") "+o).join(", ")),imgs,ticket);
   return {marque:pick(r,"marque","brand"),taille:pick(r,"taille","size"),matieres:pick(r,"matieres","matières","composition","materiaux"),entretien:pick(r,"entretien"),pays:pick(r,"pays"),rayon:pick(r,"rayon")};
 }
-
+async function writeAd(ph,label,ticket){
+  const order=[],imgs=[];const add=(p,l)=>{if(p&&imgs.length<MAXIMG){imgs.push(p.blob);order.push(l)}};
+  add(ph.face,"photo de face");add(ph.dos,"photo de dos");ph.details.forEach((p,i)=>add(p,"détail "+(i+1)));
+  return ask(AD_PROMPT.replace("IMAGES_ORDER",order.map((o,i)=>(i+1)+") "+o).join(", ")).replace("LABEL_JSON",JSON.stringify(label)),imgs,ticket);
+}
+async function fetchPrix(a,ticket){
+  return api("/api/prix",{titre:a.titre,marque:a.marque||null,type:a.type||null,taille:a.taille||null,etat:a.etat||null,matieres:a.matieres||null},ticket);
+}
+async function vignette(p){
+  if(!p)return null;try{const i=await loadImg(p.url),S=160,c=document.createElement("canvas");c.width=c.height=S;
+  const k=Math.max(S/i.width,S/i.height);c.getContext("2d").drawImage(i,(S-i.width*k)/2,(S-i.height*k)/2,i.width*k,i.height*k);return c.toDataURL("image/jpeg",.72)}catch(e){return null}
+}
+/* Une annonce complète : 1 crédit (ticket) → étiquette → rédaction → prix web → historique. */
+async function processArticle(ph,step){
+  step("Réservation d'une annonce…");
+  const st=await api("/api/annonce",{});
+  if(profil&&!profil.admin&&st.credits!=null){profil.credits=st.credits;renderQuota()}
+  step("Lecture des étiquettes…");
+  const label=await readLabels(ph,st.ticket);
+  step("Rédaction de l'annonce…");
+  const ad=await writeAd(ph,label,st.ticket);
+  const res=withBrand({...ad,...label});
+  step("Recherche des prix sur le web…");
+  let prix=null;try{prix=await fetchPrix(res,st.ticket)}catch(e){prix={error:errMsg(e,"La recherche de prix a échoué.")}}
+  let histId=null;
+  try{const h=await saveHist({...histFields(res,prix),vignette:await vignette(ph.face)});histId=h.id}catch(e){}
+  return {label,ad,res,prix,ticket:st.ticket,histId};
+}
+let curTicket=null,curHistId=null,curPrix=null;
+function applyResult(r){
+  lastLabel={...r.label,couleur:pick(r.ad,"couleur")};
+  renderAd(r.res,false);renderPrix(r.prix);adMade=true;curTicket=r.ticket;curHistId=r.histId;
+  const m=pick(r.ad,"mannequin")||({fille:"fille",garcon:"garcon",homme:"homme",femme:"femme"})[r.label.rayon];
+  if(m&&BODIES[m]){mannequin=m;syncSeg("#seg","m",m)}
+}
 async function analyse(){
-  const go=$("#go");go.disabled=true;go.innerHTML=`<span class="spin"></span>Lecture des étiquettes…`;setStatus("");
+  if(!okToSend(photos))return;
+  const go=$("#go");go.disabled=true;setStatus("");
+  const step=t=>{go.innerHTML=`<span class="spin"></span>${t}`};
   renderGallery();
   try{
-    const maxN=caps&&caps.images&&caps.images.maxCount||8;
-    const label=await readLabels(maxN);
-    go.innerHTML=`<span class="spin"></span>Rédaction de l'annonce…`;
-    const order=[],imgs=[];const add=(p,l)=>{if(p&&imgs.length<maxN){imgs.push(p.blob);order.push(l)}};
-    add(photos.face,"photo de face");add(photos.dos,"photo de dos");
-    photos.details.forEach((p,i)=>add(p,"détail "+(i+1)));
-    const ad=await sample.json(AD_PROMPT.replace("IMAGES_ORDER",order.map((o,i)=>(i+1)+") "+o).join(", ")).replace("LABEL_JSON",JSON.stringify(label)),{images:imgs,modelTier:"default"});
-    lastLabel={...label,couleur:pick(ad,"couleur")};const res={...ad,...label};
-    renderAd(res,false);adMade=true;
-    const m=pick(ad,"mannequin")||({fille:"fille",garcon:"garcon",homme:"homme",femme:"femme"})[label.rayon];
-    if(m&&BODIES[m]){mannequin=m;syncSeg("#seg","m",m)}
-    for(const k in ai)delete ai[k];bumpCount();genStudio();
-    if(!label.taille||!label.matieres)setStatus("Annonce prête, mais une partie de l'étiquette n'a pas pu être lue. Ajoutez un gros plan net de l'étiquette et relancez.",true);
-    else if(!$("#status").classList.contains("err"))setStatus("Annonce prête. Relisez-la, puis copiez-la dans votre application de vente.");
+    const r=await processArticle(photos,step);
+    applyResult(r);
+    for(const k in ai)delete ai[k];
+    if(canPhotoIA())genStudio();else renderGallery();
+    loadHist();
+    if(!r.label.taille||!r.label.matieres)setStatus("Annonce prête, mais une partie de l'étiquette n'a pas pu être lue. Ajoutez un gros plan net de l'étiquette et relancez.",true);
+    else if(!$("#status").classList.contains("err"))setStatus("Annonce prête et enregistrée dans « Mes annonces ». Relisez-la, puis copiez-la dans Vinted.");
   }catch(e){
     setStatus(errMsg(e,"L'analyse a échoué. Vérifiez vos photos et relancez."),true);
+    if(e&&e.code==="no_credit"){profil&&(profil.credits=0);renderQuota()}
   }
-  go.disabled=!photos.face;go.textContent="Créer l'annonce";
+  go.innerHTML="";updateGo();
 }
+
+/* ---------- prix ---------- */
+function renderPrix(p){
+  curPrix=p||null;
+  $("#pc").value=p&&p.prix_conseille||"";$("#pp").value=p&&p.prix_plancher||"";$("#ph").textContent=p&&p.prix_haut?p.prix_haut+" €":"—";
+  const note=$("#prixNote"),src=$("#prixSrc");note.classList.remove("err");$("#prixComp").innerHTML="";$("#prixSrcs").innerHTML="";src.hidden=true;
+  if(!p){note.textContent="Le prix est recherché sur le web après l'analyse. Plancher = n'acceptez pas d'offre en dessous.";return}
+  if(p.error){note.textContent=p.error;note.classList.add("err");return}
+  src.hidden=false;src.textContent=p.web?"Recherche web":"Estimation";src.className="badge"+(p.web?" real":"");
+  note.textContent=(p.explication||"")+(p.prix_neuf?" Prix neuf constaté : "+p.prix_neuf+" €.":"")+(p.web?"":" (recherche web indisponible : estimation à vérifier)");
+  (p.comparables||[]).filter(c=>c.prix).forEach(c=>{const li=document.createElement("li");li.textContent=(c.source?c.source+" : ":"")+c.prix+" € · "+(c.description||"");$("#prixComp").appendChild(li)});
+  (p.sources||[]).forEach(x=>{const li=document.createElement("li"),a=document.createElement("a");a.href=x.url;a.target="_blank";a.rel="noopener";a.textContent=x.titre;li.appendChild(a);$("#prixSrcs").appendChild(li)});
+}
+$("#prixBtn").onclick=async()=>{
+  if(!curTicket){toast("Créez d'abord l'annonce");return}
+  const b=$("#prixBtn");b.disabled=true;b.textContent="Recherche en cours…";
+  try{const p=await fetchPrix({titre:$("#t").value,marque:$("#marque").value,taille:$("#taille").value,etat:$("#etat").value,matieres:lastLabel.matieres},curTicket);renderPrix(p);saveCurrent(true)}
+  catch(e){toast(errMsg(e,"Recherche de prix impossible"))}
+  b.disabled=false;b.textContent="Relancer la recherche de prix";
+};
+
+/* ---------- historique ---------- */
+let hist=[],histFilter="tout";
+function histFields(a,p){return {titre:a.titre,description:a.description,marque:a.marque||null,taille:a.taille||null,categorie:a.categorie||null,etat:a.etat||null,couleur:a.couleur||null,matieres:a.matieres||null,prix_conseille:p&&p.prix_conseille||null,prix_plancher:p&&p.prix_plancher||null}}
+async function saveHist(a){const r=await api("/api/historique",{action:"enregistrer",annonce:a});return r.annonce}
+async function saveCurrent(quiet){
+  if(!adMade)return;
+  try{const h=await saveHist({id:curHistId||undefined,titre:$("#t").value,description:$("#d").value,marque:$("#marque").value,taille:$("#taille").value,categorie:$("#cat").value,etat:$("#etat").value,prix_conseille:$("#pc").value||null,prix_plancher:$("#pp").value||null,...(curHistId?{}:{vignette:await vignette(photos.face)})});
+    curHistId=h.id;if(!quiet)toast("Annonce enregistrée");loadHist()}
+  catch(e){if(!quiet)toast(errMsg(e,"Enregistrement impossible"))}
+}
+async function loadHist(){try{hist=(await api("/api/historique",{action:"liste"})).annonces||[];renderHist()}catch(e){}}
+function renderHist(){
+  const vendues=hist.filter(a=>a.statut==="vendu"),gain=vendues.reduce((s,a)=>s+(+a.prix_vendu||0),0);
+  $("#totN").textContent=hist.length;$("#totV").textContent=vendues.length;$("#totE").textContent=gain.toLocaleString("fr-FR",{maximumFractionDigits:2})+" €";
+  const ul=$("#histList");ul.innerHTML="";
+  const list=hist.filter(a=>histFilter==="tout"||a.statut===histFilter);
+  if(!list.length){ul.innerHTML=`<li class="empty">${hist.length?"Aucune annonce dans ce filtre.":"Vos annonces apparaîtront ici."}</li>`;return}
+  list.forEach(a=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<img alt=""><div><div class="t"></div><div class="m"></div></div><div class="ctl"><select aria-label="Statut"><option value="brouillon">Brouillon</option><option value="en_ligne">En ligne</option><option value="vendu">Vendu</option></select><input type="number" min="0" step="1" inputmode="decimal" placeholder="Vendu €" aria-label="Prix de vente"><button class="btn ghost sm" data-a="open" type="button">Ouvrir</button><button class="btn ghost sm" data-a="del" type="button" aria-label="Supprimer">Suppr.</button></div>`;
+    const img=li.querySelector("img");if(a.vignette)img.src=a.vignette;else img.style.visibility="hidden";
+    li.querySelector(".t").textContent=a.titre;
+    li.querySelector(".m").textContent=[a.marque,a.taille,new Date(a.date).toLocaleDateString("fr-FR"),a.prix_conseille&&("conseillé "+a.prix_conseille+" €"),a.prix_plancher&&("plancher "+a.prix_plancher+" €")].filter(Boolean).join(" · ");
+    const sel=li.querySelector("select"),inp=li.querySelector("input");sel.value=a.statut;inp.value=a.prix_vendu??"";inp.hidden=a.statut!=="vendu";
+    if(a.statut==="vendu")li.querySelector(".t").classList.add("vendu");
+    const upd=async patch=>{try{const h=await saveHist({id:a.id,...patch});Object.assign(a,h);renderHist()}catch(e){toast(errMsg(e,"Mise à jour impossible"))}};
+    sel.onchange=()=>upd({statut:sel.value});inp.onchange=()=>upd({prix_vendu:inp.value||null});
+    li.querySelector('[data-a="open"]').onclick=()=>openHist(a);
+    li.querySelector('[data-a="del"]').onclick=async()=>{if(!confirm("Supprimer « "+a.titre+" » de l'historique ?"))return;try{await api("/api/historique",{action:"supprimer",id:a.id});hist=hist.filter(x=>x.id!==a.id);if(curHistId===a.id)curHistId=null;renderHist()}catch(e){toast(errMsg(e,"Suppression impossible"))}};
+    ul.appendChild(li);
+  });
+}
+function openHist(a){
+  renderAd({titre:a.titre,description:a.description,marque:a.marque,taille:a.taille,categorie:a.categorie,etat:a.etat,matieres:a.matieres,couleur:a.couleur,details:[]},false);
+  renderPrix(a.prix_conseille||a.prix_plancher?{prix_conseille:a.prix_conseille,prix_plancher:a.prix_plancher,explication:"Prix enregistrés.",web:false,sources:[]}:null);
+  $("#prixSrc").hidden=true;adMade=true;curHistId=a.id;curTicket=null;
+  document.getElementById("annonce").scrollIntoView({behavior:"smooth"});
+}
+$("#histFilter").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;histFilter=b.dataset.f;syncSeg("#histFilter","f",histFilter);renderHist()});
+$("#saveAd").onclick=()=>{if(!adMade){toast("Créez d'abord une annonce");return}saveCurrent(false)};
+
+/* ---------- mode lot ---------- */
+let lotMode=false;const lot=[];
+function clonePhotos(){return {face:photos.face,dos:photos.dos,etiquette:[...photos.etiquette],details:[...photos.details]}}
+function clearPhotos(){for(const k in ai)delete ai[k];photos.face=photos.dos=null;photos.etiquette=[];photos.details=[];cutCache.clear();renderSlots();renderGallery()}
+function addToLot(){
+  if(!photos.face){toast("Ajoutez au moins la photo de face");return}
+  if(!okToSend(photos))return;
+  lot.push({id:Date.now()+Math.random(),ph:clonePhotos(),state:"attente",msg:"En attente"});
+  clearPhotos();renderLot();toast("Article "+lot.length+" ajouté au lot");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderLot(){
+  const pend=lot.filter(x=>x.state==="attente").length,run=lot.some(x=>x.state==="encours");
+  $("#lot").hidden=!lotMode&&!lot.length;
+  $("#lotTitle").textContent="Lot : "+plur(lot.length,"article")+(pend&&pend<lot.length?" ("+pend+" en attente)":"");
+  const rb=$("#lotRun");rb.disabled=!pend||run;rb.textContent=run?"En cours…":"Lancer le lot"+(pend?" ("+pend+")":"");
+  const ul=$("#lotList");ul.innerHTML="";
+  lot.forEach((it,i)=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<img alt=""><div class="txt"><span></span><small></small></div>`;
+    li.querySelector("img").src=it.ph.face.url;
+    li.querySelector("span").textContent=it.res?it.res.titre:"Article "+(i+1);
+    const sm=li.querySelector("small");sm.textContent=it.msg;li.querySelector(".txt").classList.toggle("err",it.state==="erreur");li.querySelector(".txt").classList.toggle("ok",it.state==="prete");
+    if(it.state==="encours"){const sp=document.createElement("span");sp.className="spin";li.appendChild(sp)}
+    if(it.state==="prete"){const b=document.createElement("button");b.className="btn sm";b.type="button";b.textContent="Ouvrir";b.onclick=()=>openLotItem(it);li.appendChild(b)}
+    if(it.state==="attente"||it.state==="erreur"){const b=document.createElement("button");b.className="btn ghost sm";b.type="button";b.textContent="Retirer";b.onclick=()=>{lot.splice(lot.indexOf(it),1);renderLot()};li.appendChild(b)}
+    ul.appendChild(li);
+  });
+}
+async function runLot(){
+  const todo=lot.filter(x=>x.state==="attente"||x.state==="erreur");if(!todo.length)return;
+  if(profil&&!profil.admin&&profil.credits<todo.length){
+    if(profil.credits<=0){openAsk(todo.length);return}
+    if(!confirm("Il vous reste "+plur(profil.credits,"annonce")+" pour "+plur(todo.length,"article")+". "+(profil.credits>1?"Seuls les "+profil.credits+" premiers seront traités":"Seul le premier sera traité")+". Continuer ?"))return;
+  }
+  todo.forEach(x=>{x.state="attente";x.msg="En attente"});
+  for(const it of todo){
+    it.state="encours";renderLot();
+    try{const r=await processArticle(it.ph,m=>{it.msg=m;renderLot()});Object.assign(it,r);it.state="prete";it.msg="Prête · "+[r.res.marque,r.prix&&r.prix.prix_conseille&&r.prix.prix_conseille+" €"].filter(Boolean).join(" · ")}
+    catch(e){it.state="erreur";it.msg=errMsg(e,"Échec, relancez");if(e&&e.code==="no_credit"){todo.filter(x=>x.state==="attente").forEach(x=>{x.msg="Plus de crédit"});renderLot();break}}
+    renderLot();
+  }
+  loadHist();renderLot();
+  const ok=lot.filter(x=>x.state==="prete").length;toast(plur(ok,"annonce")+" prête"+(ok>1?"s":""));
+}
+function openLotItem(it){
+  for(const k in ai)delete ai[k];cutCache.clear();
+  photos.face=it.ph.face;photos.dos=it.ph.dos;photos.etiquette=[...it.ph.etiquette];photos.details=[...it.ph.details];
+  applyResult(it);renderSlots();renderGallery();
+  document.getElementById("annonce").scrollIntoView({behavior:"smooth"});
+}
+$("#lotBtn").onclick=()=>{lotMode=!lotMode;$("#lotBtn").setAttribute("aria-pressed",lotMode);renderLot();updateGo()};
+$("#lotRun").onclick=runLot;
+
+/* ---------- bouton principal ---------- */
+function updateGo(){
+  const go=$("#go");if(go.querySelector(".spin"))return;
+  const noCredit=profil&&!profil.admin&&profil.credits<=0;
+  if(lotMode){go.textContent="Ajouter au lot";go.disabled=!photos.face;return}
+  if(noCredit){go.textContent="Demander des annonces";go.disabled=false;return}
+  go.textContent="Créer l'annonce";go.disabled=!photos.face;
+}
+function onGo(){
+  if(lotMode)return addToLot();
+  if(profil&&!profil.admin&&profil.credits<=0)return openAsk(10);
+  analyse();
+}
+function openAsk(n){
+  $("#askA").value=n||10;$("#askP").value=0;$("#askM").value="";
+  const d=$("#askDlg");if(d.showModal)d.showModal();else d.setAttribute("open","");
+}
+$("#askForm").addEventListener("submit",async ev=>{
+  if(ev.submitter&&ev.submitter.value!=="send")return;
+  ev.preventDefault();const b=$("#askGo");b.disabled=true;
+  try{await api("/api/demande",{annonces:+$("#askA").value,photos:+$("#askP").value,message:$("#askM").value});$("#askDlg").close();toast("Demande envoyée")}
+  catch(e){toast(errMsg(e,"Envoi impossible"))}
+  b.disabled=false;
+});
 
 /* ---------- copy & controls ---------- */
 async function copy(text,ok){
@@ -658,23 +962,25 @@ function syncSeg(sel,attr,val){[...$(sel).children].forEach(b=>b.setAttribute("a
 $("#copyAll").onclick=()=>copy($("#t").value+"\n\n"+$("#d").value,"Annonce copiée");
 $("#copyT").onclick=()=>copy($("#t").value,"Titre copié");
 $("#copyD").onclick=()=>copy($("#d").value,"Description copiée");
-$("#go").onclick=analyse;
-$("#regen").onclick=()=>{if(!photos.face){toast("Ajoutez d'abord la photo de face");return}genStudio()};
+$("#go").onclick=onGo;
+$("#copyM").onclick=()=>{const m=$("#marque").value.trim();if(!m){toast("Marque inconnue");return}copy(m,"Marque copiée")};
+$("#regen").onclick=()=>{if(!photos.face){toast("Ajoutez d'abord la photo de face");return}if(!canPhotoIA()){openAsk(0);$("#askP").value=3;return}genStudio()};
 let adMade=false;
 function newAd(){
   const busy=photos.face||photos.dos||photos.etiquette.length||photos.details.length;
   if(busy&&adMade&&!confirm("Commencer une nouvelle annonce ? L'annonce et les photos en cours seront effacées."))return;
-  for(const k in ai)delete ai[k];lastLabel={};adMade=false;photos.face=photos.dos=null;photos.etiquette=[];photos.details=[];cutCache.clear();
-  renderSlots();renderGallery();renderAd(EXAMPLE,true);setStatus("");window.scrollTo({top:0,behavior:"smooth"});
+  for(const k in ai)delete ai[k];lastLabel={};adMade=false;curTicket=null;curHistId=null;photos.face=photos.dos=null;photos.etiquette=[];photos.details=[];cutCache.clear();
+  renderSlots();renderGallery();renderAd(EXAMPLE,true);renderPrix(null);setStatus("");window.scrollTo({top:0,behavior:"smooth"});
 }
 $("#reset").onclick=newAd;$("#newAd").onclick=newAd;
 $("#seg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;mannequin=b.dataset.m;syncSeg("#seg","m",mannequin);renderPorte()});
 $("#zone").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;zone=b.dataset.z;syncSeg("#zone","z",zone);renderPorte()});
 
-renderSlots();renderQuota();renderSpend();renderAd(EXAMPLE,true);renderGallery();
+renderSlots();renderQuota();renderSpend();renderAd(EXAMPLE,true);renderPrix(null);renderGallery();
+if(getCode()){refreshProfil().then(()=>{if(getCode())loadHist()})}
 /* bottom nav follows the section in view */
 try{const links=[...document.querySelectorAll(".nav a")];const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+en.target.id))})},{rootMargin:"-45% 0px -50% 0px"});
-  ["photos","etiquette","studio","annonce"].forEach(id=>io.observe(document.getElementById(id)))}catch(e){}
+  ["photos","etiquette","studio","annonce","historique"].forEach(id=>io.observe(document.getElementById(id)))}catch(e){}
 
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}))}
 })();

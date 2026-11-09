@@ -1,12 +1,12 @@
 import type { Config } from "@netlify/functions"
-import { checkAccess, fail } from "../lib/gemini.mts"
+import { fail } from "../lib/gemini.mts"
+import { publicVendeur, whoIs } from "../lib/store.mts"
 
-// POST /api/access  (header x-access-code) → { ok: true } if the code is right.
-// Lets the app check the code on the welcome screen without calling Gemini.
+// POST /api/access  (en-tête x-access-code) → profil du vendeur : nom et crédits restants.
+// Ne consomme rien : sert à l'écran d'accueil et à rafraîchir le compteur.
 export default async (req: Request) => {
   try {
-    checkAccess(req)
-    return Response.json({ ok: true })
+    return Response.json({ ok: true, ...publicVendeur(await whoIs(req)) })
   } catch (e) {
     return fail(e)
   }

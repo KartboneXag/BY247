@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Studio Fripe · Admin</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+:root{--base:#FAFAFB;--card:#fff;--ink:#121218;--muted:#5A5C6B;--hair:rgba(20,20,40,.1);--rust:#B4471E;--warn:#C23B2B;--ok:#1C8A57;--sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--base:#0D0D12;--card:#1A1A22;--ink:#F1F1F5;--muted:#A9AABB;--hair:rgba(255,255,255,.1);--rust:#D0602F;--warn:#F28B78;--ok:#5ECB95;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--base);color:var(--ink);font:16px/1.5 var(--sans)}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:24px;margin:0 0 4px;letter-spacing:-.03em}
+h2{font-size:18px;margin:26px 0 10px;display:flex;align-items:center;gap:8px}
+.sub{color:var(--muted);margin:0 0 16px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:20px;padding:14px}
+.btn{appearance:none;border:0;border-radius:30px;padding:9px 14px;font:700 14px var(--sans);cursor:pointer;background:var(--ink);color:var(--base)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--hair)}
+.btn.rust{background:var(--rust);color:#fff}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn:disabled{opacity:.4}
+input{font:16px var(--sans);color:var(--ink);background:var(--base);border:1px solid var(--hair);border-radius:12px;padding:9px 11px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.list{display:flex;flex-direction:column;gap:10px}
+.v{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center}
+.v .nom{font-weight:800;font-size:16px}
+.code{font:600 14px var(--mono);background:var(--base);border:1px dashed var(--hair);border-radius:10px;padding:3px 8px;cursor:pointer}
+.k{font-size:13px;color:var(--muted)}
+.nums{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+.nums b{font-size:18px}
+.zero{color:var(--warn)}
+.ctl{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.dem{border-left:4px solid var(--rust)}
+.gate{max-width:360px;margin:15vh auto 0;display:flex;flex-direction:column;gap:12px;text-align:center}
+.msg{color:var(--warn);font-weight:600;min-height:20px;font-size:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--base);padding:10px 16px;border-radius:30px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.empty{color:var(--muted);font-size:14px}
+.hist{margin:8px 0 0;padding:0;list-style:none;grid-column:1/-1;font-size:13.5px;color:var(--muted)}
+a{color:var(--rust)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <form class="card gate" id="gate" hidden autocomplete="off">
+    <h1>Studio Fripe · Admin</h1>
+    <p class="sub">Code administrateur (variable ADMIN_CODE dans Netlify).</p>
+    <input id="code" type="password" aria-label="Code administrateur" required>
+    <div class="msg" id="msg" role="alert"></div>
+    <button class="btn">Entrer</button>
+  </form>
+
+  <div id="app" hidden>
+    <div class="row" style="justify-content:space-between">
+      <div><h1>Studio Fripe · Admin</h1><p class="sub">Un vendeur créé démarre à 0 : il ne peut rien faire tant que vous ne lui accordez pas de crédits.</p></div>
+      <div class="row"><a class="btn ghost sm" href="/">Ouvrir l'appli</a><button class="btn ghost sm" id="out" type="button">Se déconnecter</button></div>
+    </div>
+
+    <h2>Demandes en attente <span class="k" id="nDem"></span></h2>
+    <div class="list" id="dems"></div>
+
+    <h2>Nouveau vendeur</h2>
+    <form class="card row" id="newV">
+      <input id="nom" placeholder="Nom du vendeur" maxlength="60" required style="flex:1;min-width:180px">
+      <button class="btn rust">Créer le code</button>
+    </form>
+
+    <h2>Vendeurs <span class="k" id="nV"></span></h2>
+    <div class="list" id="vendeurs"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const KEY="studio-fripe-admin";
+let code="";try{code=sessionStorage.getItem(KEY)||""}catch(e){}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2200)}
+async function api(body){
+  const r=await fetch("/api/admin",{method:"POST",headers:{"content-type":"application/json","x-access-code":code},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.error||"Erreur "+r.status),{code:j.code});return j;
+}
+const plur=(n,w)=>n+" "+w+(n>1?"s":"");
+const d=iso=>iso?new Date(iso).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"}):"jamais";
+function el(html){const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstChild}
+function esc(s){return String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+
+async function load(){
+  let st;try{st=await api({action:"etat"})}catch(e){if(e.code==="bad_code"||e.code==="forbidden"){gate("Code administrateur incorrect.");return}toast(e.message);return}
+  $("#gate").hidden=true;$("#app").hidden=false;
+  const byId=Object.fromEntries(st.vendeurs.map(v=>[v.id,v]));
+  // demandes
+  const D=$("#dems");D.innerHTML="";$("#nDem").textContent=st.demandes.length?"("+st.demandes.length+")":"";
+  if(!st.demandes.length)D.innerHTML='<p class="empty">Aucune demande.</p>';
+  st.demandes.forEach(x=>{
+    const v=byId[x.vendeur];
+    const c=el(`<div class="card dem v"><div><div class="nom">${esc(x.nom)}</div><div class="k">${d(x.date)} · demande ${plur(x.annonces,"annonce")} et ${plur(x.photos,"photo")} IA${v?"":" · vendeur supprimé"}</div>${x.message?`<div>« ${esc(x.message)} »</div>`:""}</div>
+      <div class="ctl"><input type="number" min="0" value="${x.annonces}" style="width:90px" aria-label="Annonces à accorder"><span class="k">annonces</span><input type="number" min="0" value="${x.photos}" style="width:90px" aria-label="Photos IA à accorder"><span class="k">photos IA</span>
+      <button class="btn rust sm" data-a="ok" ${v?"":"disabled"}>Accorder</button><button class="btn ghost sm" data-a="no">Refuser</button></div></div>`);
+    const [ia,ip]=c.querySelectorAll("input");
+    c.querySelector('[data-a="ok"]').onclick=async()=>{try{await api({action:"accorder",id:x.vendeur,demande:x.id,addCredits:+ia.value,addPhotos:+ip.value});toast("Crédits accordés à "+x.nom);load()}catch(e){toast(e.message)}};
+    c.querySelector('[data-a="no"]').onclick=async()=>{try{await api({action:"refuser",demande:x.id});load()}catch(e){toast(e.message)}};
+    D.appendChild(c);
+  });
+  // vendeurs
+  const V=$("#vendeurs");V.innerHTML="";$("#nV").textContent="("+st.vendeurs.length+")";
+  if(!st.vendeurs.length)V.innerHTML='<p class="empty">Aucun vendeur pour l’instant.</p>';
+  st.vendeurs.forEach(v=>{
+    const c=el(`<div class="card v"><div><div class="nom">${esc(v.nom)}</div><div class="row"><span class="code" title="Cliquer pour copier">${esc(v.code)}</span><span class="k">créé ${d(v.cree)} · dernière annonce ${d(v.dernier)}</span></div></div>
+      <div class="nums"><span><b class="${v.credits?"":"zero"}">${v.credits}</b> annonces</span><span><b class="${v.photosIA?"":"zero"}">${v.photosIA}</b> photos IA</span></div>
+      <div class="k" style="grid-column:1/-1">Utilisé : ${plur(v.annonces,"annonce")}, ${plur(v.photosFaites,"photo")} IA</div>
+      <div class="ctl"><button class="btn sm" data-c="5">+5 annonces</button><button class="btn sm" data-c="10">+10</button><button class="btn ghost sm" data-p="3">+3 photos IA</button>
+      <button class="btn ghost sm" data-a="zero">Remettre à 0</button><button class="btn ghost sm" data-a="hist">Annonces</button><button class="btn ghost sm" data-a="del">Supprimer</button></div></div>`);
+    c.querySelector(".code").onclick=async()=>{try{await navigator.clipboard.writeText(v.code);toast("Code copié")}catch(e){toast(v.code)}};
+    const upd=async b=>{try{await api({action:"crediter",id:v.id,...b});load()}catch(e){toast(e.message)}};
+    c.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>upd({addCredits:+b.dataset.c}));
+    c.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>upd({addPhotos:+b.dataset.p}));
+    c.querySelector('[data-a="zero"]').onclick=()=>{if(confirm("Remettre "+v.nom+" à 0 annonce et 0 photo IA ?"))upd({credits:0,photosIA:0})};
+    c.querySelector('[data-a="del"]').onclick=async()=>{if(!confirm("Supprimer "+v.nom+" ? Son code ne marchera plus."))return;try{await api({action:"supprimer",id:v.id});load()}catch(e){toast(e.message)}};
+    c.querySelector('[data-a="hist"]').onclick=async e=>{
+      const old=c.querySelector(".hist");if(old){old.remove();return}
+      try{const r=await api({action:"annonces",id:v.id});const ul=el('<ul class="hist"></ul>');
+        if(!r.annonces.length)ul.innerHTML="<li>Aucune annonce.</li>";
+        r.annonces.forEach(a=>{const li=document.createElement("li");li.textContent=d(a.date)+" · "+a.titre+" · "+({brouillon:"brouillon",en_ligne:"en ligne",vendu:"vendu"+(a.prix_vendu?" "+a.prix_vendu+" €":"")})[a.statut];ul.appendChild(li)});
+        c.appendChild(ul)}catch(err){toast(err.message)}
+    };
+    V.appendChild(c);
+  });
+}
+function gate(m){$("#app").hidden=true;$("#gate").hidden=false;$("#msg").textContent=m||"";setTimeout(()=>$("#code").focus(),50)}
+$("#gate").onsubmit=e=>{e.preventDefault();code=$("#code").value.trim();try{sessionStorage.setItem(KEY,code)}catch(err){}$("#code").value="";load()};
+$("#out").onclick=()=>{code="";try{sessionStorage.removeItem(KEY)}catch(e){}gate()};
+$("#newV").onsubmit=async e=>{e.preventDefault();try{const r=await api({action:"creer",nom:$("#nom").value.trim()});$("#nom").value="";toast("Code créé : "+r.vendeur.code);load()}catch(err){toast(err.message)}};
+if(code)load();else gate();
+})();
+</script>
+</body>
+</html>
