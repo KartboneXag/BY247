@@ -113,6 +113,7 @@ h3{font-weight:700;font-size:17px;margin:6px 0 0;letter-spacing:-.01em}
 .badge{font:500 10.5px var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:2px 7px;border-radius:20px;border:1px solid var(--hair);color:var(--muted)}
 .badge.real{color:var(--ok);border-color:var(--ok)}
 .badge.ai{color:var(--rust);border-color:var(--rust)}
+.btn.fix{background:var(--rust);color:var(--rust-ink);flex-basis:100%}
 .gen{aspect-ratio:4/5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:14px;font-weight:600;background:linear-gradient(120deg,var(--glass-2),var(--glass),var(--glass-2));background-size:200% 100%;animation:sh 1.6s linear infinite}
 @keyframes sh{to{background-position:-200% 0}}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
@@ -144,6 +145,15 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
 .spin{width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.spin,.gen{animation:none}.toast{transition:none}}
+.topr{display:flex;align-items:center;gap:10px}
+.spend{display:flex;justify-content:flex-end;margin-top:8px}
+.spend span{font-size:12.5px;font-weight:600;color:var(--muted);padding:5px 12px;border-radius:20px;white-space:nowrap}
+.spend b{color:var(--ink);font-weight:800}
+.newad{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.newad svg{width:16px;height:16px}
+@media (max-width:430px){.top{gap:8px}.topr{gap:6px}.ws{padding-right:10px!important}.mark{width:40px;margin-left:2px}.newad{padding:7px 10px;font-size:12.5px}.av.lg{width:42px;height:42px;font-size:15px}}
+@media (max-width:380px){.newad .lng{display:none}}
+@media (max-width:340px){.av.lg{display:none}}
 /* access code screen */
 .gate{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:var(--base)}
 .gate .card{width:100%;max-width:380px;border-radius:28px;padding:28px 22px;display:flex;flex-direction:column;gap:14px;text-align:center}
@@ -178,8 +188,10 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
 <div class="gut">
   <div class="top">
     <div class="ws glass"><svg class="mark" viewBox="0 0 64 48" role="img" aria-label="Logo Studio Fripe"><g fill="none" stroke="var(--rust)" stroke-linecap="round" stroke-linejoin="round"><path d="M32 17.5v-2.2c0-2.6 5.4-3.4 5.4-8.1a5.4 5.4 0 0 0-10.8 0" stroke-width="3.6"/><path d="M32 18.5 7.5 32.2c-3.6 2-2.2 7.3 1.9 7.3h45.2c4.1 0 5.5-5.3 1.9-7.3Z" stroke-width="4.4"/></g><circle cx="32" cy="31.5" r="10.2" fill="var(--rust)"/><circle cx="32" cy="31.5" r="6.8" fill="#fff"/><circle cx="32" cy="31.5" r="4.9" fill="var(--rust)"/><circle cx="34.6" cy="28.9" r="1.5" fill="#fff"/><circle cx="39.6" cy="25.2" r="1.3" fill="#fff"/></svg><span class="word"><b>Studio Fripe</b><small>By 247</small></span></div>
-    <div class="av lg" title="Annonces créées ce mois" aria-label="Annonces créées ce mois">XG<span class="num" id="quota">0</span></div>
+    <div class="topr"><button class="btn sm newad" id="newAd" type="button"><svg aria-hidden="true"><use href="#i-plus"/></svg>Nouvelle<span class="lng">&nbsp;annonce</span></button>
+    <div class="av lg" title="Annonces créées ce mois" aria-label="Annonces créées ce mois">XG<span class="num" id="quota">0</span></div></div>
   </div>
+  <div class="spend" id="spend" title="Coût estimé des images générées par Gemini sur cet appareil, au tarif public de Google"><span class="glass">Images IA : <b id="spendN">0</b> · coût cumulé <b id="spendAmt">≈ 0,00 $</b></span></div>
 
   <section id="photos" aria-labelledby="h-hero">
     <div class="hero">
@@ -191,7 +203,7 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
     <div class="composer glass">
       <div class="slots" id="slots"></div>
       <div class="bar">
-        <button class="iconbtn" id="reset" title="Nouvel article" aria-label="Nouvel article"><svg><use href="#i-plus"/></svg></button>
+        <button class="iconbtn" id="reset" title="Nouvelle annonce" aria-label="Nouvelle annonce"><svg><use href="#i-plus"/></svg></button>
         <div class="quota" id="quotaTxt">0 annonce sur 5 gratuites ce mois</div>
         <button class="go" id="go" disabled>Créer l'annonce</button>
       </div>
@@ -254,8 +266,7 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:70
 <script>
 (function(){
 const $=s=>document.querySelector(s);
-const MAX_MULTI=3;
-const SLOTS=[{k:"face",l:"Face"},{k:"dos",l:"Dos"},{k:"etiquette",l:"Étiquettes",multi:true},{k:"details",l:"Détails",multi:true}];
+const SLOTS=[{k:"face",l:"Face"},{k:"dos",l:"Dos"},{k:"etiquette",l:"Étiquettes",multi:true,max:3},{k:"details",l:"Détails",multi:true,max:2}];
 const photos={face:null,dos:null,etiquette:[],details:[]};
 const ai={}; let lastLabel={};
 let mannequin="femme", zone="haut";
@@ -273,6 +284,10 @@ function monthKey(){const d=new Date();return "sf-count-"+d.getFullYear()+"-"+(d
 function getCount(){try{return +localStorage.getItem(monthKey())||0}catch(e){return 0}}
 function bumpCount(){try{localStorage.setItem(monthKey(),getCount()+1)}catch(e){} renderQuota()}
 function renderQuota(){const c=getCount();$("#quota").textContent=Math.min(c,99);$("#quotaTxt").textContent=c+(c>1?" annonces":" annonce")+" sur 5 gratuites ce mois"+(c>=5?" · limite atteinte":"")}
+const SPEND_KEY="sf-spend";
+function getSpend(){try{return JSON.parse(localStorage.getItem(SPEND_KEY))||{usd:0,n:0}}catch(e){return {usd:0,n:0}}}
+function renderSpend(){const s=getSpend();$("#spendAmt").textContent="≈ "+s.usd.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2})+" $";$("#spendN").textContent=s.n}
+function addSpend(usd){const s=getSpend();s.usd+=+usd||0.039;s.n++;try{localStorage.setItem(SPEND_KEY,JSON.stringify(s))}catch(e){}renderSpend()}
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),1800)}
 function setStatus(m,err){const s=$("#status");s.textContent=m;s.classList.toggle("err",!!err)}
 
@@ -282,11 +297,11 @@ function renderSlots(){
   SLOTS.forEach(s=>{
     const list=s.multi?photos[s.k]:null;
     const has=s.multi?list.length:photos[s.k];
-    const full=s.multi&&list.length>=MAX_MULTI;
+    const full=s.multi&&list.length>=s.max;
     const el=document.createElement("label");el.className="slot"+(has?" filled":"");
     const src=s.multi?(list[list.length-1]&&list[list.length-1].url):(has&&photos[s.k].url);
-    const capTxt=s.l+(s.multi?" "+list.length+"/"+MAX_MULTI:"");
-    el.innerHTML=(src?`<img alt="">`:`<span class="plus">+</span>`)+`<span${src?' class="cap"':''}>${capTxt}</span>`+(s.multi&&!src?`<span style="font-weight:400;font-size:11px">jusqu'à 3</span>`:"");
+    const capTxt=s.l+(s.multi?" "+list.length+"/"+s.max:"");
+    el.innerHTML=(src?`<img alt="">`:`<span class="plus">+</span>`)+`<span${src?' class="cap"':''}>${capTxt}</span>`+(s.multi&&!src?`<span style="font-weight:400;font-size:11px">jusqu'à ${s.max}</span>`:"");
     if(src) el.querySelector("img").src=src;
     if(s.multi&&has&&!full){const a=document.createElement("span");a.className="cap";a.style.cssText="left:auto;right:6px;bottom:6px";a.textContent="+ ajouter";el.appendChild(a)}
     const inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.id="in-"+s.k;inp.setAttribute("aria-label","Photo "+s.l);
@@ -294,15 +309,15 @@ function renderSlots(){
     inp.onchange=async()=>{
       const files=[...inp.files];if(!files.length)return;
       for(const f of files){
-        if(s.multi&&photos[s.k].length>=MAX_MULTI){toast("3 photos maximum");break}
+        if(s.multi&&photos[s.k].length>=s.max){toast(s.max+" photos maximum");break}
         const p=await prep(f,s.k==="etiquette");if(!p)continue;
         if(s.multi)photos[s.k].push(p);else{photos[s.k]=p;cutCache.delete(s.k);if(s.k==="face")for(const k in ai)delete ai[k];else delete ai.dos}
       }
-      renderSlots();
+      renderSlots();if(s.k==="details")renderGallery();
     };
     el.appendChild(inp);
     if(has){const b=document.createElement("button");b.className="clr";b.type="button";b.textContent="×";b.setAttribute("aria-label","Retirer "+s.l);
-      b.onclick=e=>{e.preventDefault();e.stopPropagation();if(s.multi)photos[s.k].pop();else{photos[s.k]=null;cutCache.delete(s.k)}renderSlots()};el.appendChild(b)}
+      b.onclick=e=>{e.preventDefault();e.stopPropagation();if(s.multi)photos[s.k].pop();else{photos[s.k]=null;cutCache.delete(s.k)}renderSlots();if(s.k==="details")renderGallery()};el.appendChild(b)}
     box.appendChild(el);
   });
   $("#go").disabled=!photos.face;
@@ -457,13 +472,14 @@ function renderAd(a,isExample){
 function updCount(){$("#tc").textContent=$("#t").value.length+" car."}
 $("#t").addEventListener("input",updCount);
 
-function shotCard(src,label,real,dlName,el){
+function shotCard(src,label,real,dlName,el,onFix){
   el=el||document.createElement("div");el.className="shot";el.innerHTML="";
   el.appendChild(src);
   const m=document.createElement("div");m.className="meta";
   m.innerHTML=`<span class="badge${real===true?" real":real==="ai"?" ai":""}">${real===true?"Vraie photo":real==="ai"?"Studio IA":"Aperçu"}</span>`;
   const t=document.createElement("span");t.textContent=label;m.prepend(t);
   if(dlName){const b=document.createElement("button");b.className="btn ghost sm";b.textContent="Enregistrer";b.onclick=()=>saveShot(src,dlName);m.appendChild(b)}
+  if(onFix){const f=document.createElement("button");f.className="btn sm fix";f.type="button";f.textContent="Corriger l’erreur";f.title="Gemini compare avec la vraie photo et refait l’image (une seule fois)";f.onclick=onFix;m.appendChild(f)}
   el.appendChild(m);return el;
 }
 async function saveShot(src,name){
@@ -480,6 +496,21 @@ function loadingCard(label,el){
 }
 function aiImg(url,label){const i=new Image();i.src=url;i.alt=label;return i}
 function asImg(cv,label){cv.setAttribute("role","img");cv.setAttribute("aria-label",label);return cv}
+/* detail photo pasted small in the top-left corner of a studio shot */
+async function withInset(base,det){
+  if(!det)return base;
+  const b=base.tagName==="CANVAS"?base:await loadImg(base.src),d=await loadImg(det.url);
+  const W=b.width||b.naturalWidth,H=b.height||b.naturalHeight;
+  const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.drawImage(b,0,0,W,H);
+  const S=Math.round(Math.min(W,H)*.3),m=Math.round(Math.min(W,H)*.04),bd=Math.max(3,Math.round(S*.035)),r=Math.round(S*.08);
+  const rr=(X,Y,w,h,rad)=>{x.beginPath();x.moveTo(X+rad,Y);x.arcTo(X+w,Y,X+w,Y+h,rad);x.arcTo(X+w,Y+h,X,Y+h,rad);x.arcTo(X,Y+h,X,Y,rad);x.arcTo(X,Y,X+w,Y,rad);x.closePath()};
+  x.save();x.shadowColor="rgba(0,0,0,.25)";x.shadowBlur=S*.06;x.fillStyle="#fff";rr(m,m,S,S,r);x.fill();x.restore();
+  const k=Math.max(S/d.width,S/d.height),sw=S/k,sh=S/k;
+  x.save();rr(m+bd,m+bd,S-2*bd,S-2*bd,Math.max(1,r-bd));x.clip();
+  x.drawImage(d,(d.width-sw)/2,(d.height-sh)/2,sw,sh,m+bd,m+bd,S-2*bd,S-2*bd);x.restore();
+  c.setAttribute("role","img");c.setAttribute("aria-label",(base.alt||base.getAttribute("aria-label")||"Photo")+" avec photo détail");
+  return c;
+}
 async function renderGallery(){
   const g=$("#gallery");g.innerHTML="";
   if(!photos.face){g.innerHTML=`<p class="hint" style="grid-column:1/-1">Ajoutez au moins la photo de face pour voir les mises en scène.</p>`;renderPorte();return}
@@ -490,8 +521,9 @@ async function renderGallery(){
     if(!photos[k])continue;
     const st=ai[k];
     if(st==="loading"){g.appendChild(loadingCard(l));continue}
-    if(st&&st.url){g.appendChild(shotCard(aiImg(st.url,l),l,"ai",`studio-fripe-${k}-cintre.png`));continue}
-    try{const r=await cutout(k);if(!r.cut)failed=true;g.appendChild(shotCard(asImg(onHanger(r),l),r.cut?l:l.replace("sur cintre","cadré"),false,`studio-fripe-${k}-cintre.jpg`))}catch(e){}
+    const det=photos.details[k==="face"?0:1];
+    if(st&&st.url){const fx=st.fixed?null:()=>genShot(k,true);try{g.appendChild(shotCard(await withInset(aiImg(st.url,l),det),l,"ai",`studio-fripe-${k}-cintre.jpg`,null,fx))}catch(e){g.appendChild(shotCard(aiImg(st.url,l),l,"ai",`studio-fripe-${k}-cintre.png`,null,fx))}continue}
+    try{const r=await cutout(k);if(!r.cut)failed=true;g.appendChild(shotCard(await withInset(asImg(onHanger(r),l),det),r.cut?l:l.replace("sur cintre","cadré"),false,`studio-fripe-${k}-cintre.jpg`))}catch(e){}
   }
   if(failed)setStatus("Le fond de la photo est trop chargé pour détourer l'article. Reprenez-la à plat sur un fond uni.",true);
   renderPorte();
@@ -501,7 +533,7 @@ async function renderPorte(){
   if(!photos.face){box.className="hint";box.textContent="La photo portée apparaîtra ici une fois la photo de face ajoutée.";return}
   const lbl={femme:"Femme",homme:"Homme",fille:"Fille",garcon:"Garçon"}[mannequin],key="porte-"+mannequin,st=ai[key];
   if(st==="loading"){loadingCard("Porté · "+lbl,box);return}
-  if(st&&st.url){shotCard(aiImg(st.url,"Porté "+lbl),"Porté · "+lbl,"ai",`studio-fripe-porte-${mannequin}.png`,box);return}
+  if(st&&st.url){shotCard(aiImg(st.url,"Porté "+lbl),"Porté · "+lbl,"ai",`studio-fripe-porte-${mannequin}.png`,box,st.fixed?null:()=>genShot(key,true));return}
   try{const r=await cutout("face");
     shotCard(asImg(onMannequin(r),"Porté "+lbl),"Porté · "+lbl,false,`studio-fripe-porte-${mannequin}.jpg`,box)}catch(e){}
   const b=document.createElement("button");b.className="btn sm";b.style.margin="0 12px 12px";b.textContent="Générer la photo portée "+lbl.toLowerCase()+" en studio IA";b.onclick=()=>genShot(key);box.appendChild(b);
@@ -560,14 +592,24 @@ if(!getCode())showGate();
 const sample={json:async(prompt,{images})=>(await api("/api/analyse",{prompt,images:await Promise.all(images.map(b64))})).result};
 const caps={images:{maxCount:8}};
 
-async function genShot(key){
+async function toJpegB64(url){
+  const i=await loadImg(url),r=Math.min(1,1280/Math.max(i.width,i.height));
+  const c=document.createElement("canvas");c.width=Math.round(i.width*r);c.height=Math.round(i.height*r);c.getContext("2d").drawImage(i,0,0,c.width,c.height);
+  return c.toDataURL("image/jpeg",.88).split(",")[1];
+}
+async function genShot(key,fix){
   const kind=key.startsWith("porte")?"porte":"cintre",src=key==="dos"?photos.dos:photos.face;if(!src)return;
-  ai[key]="loading";key.startsWith("porte")?renderPorte():renderGallery();
+  const prev=ai[key];if(fix&&!(prev&&prev.url&&!prev.fixed))return;
+  const redraw=()=>key.startsWith("porte")?renderPorte():renderGallery();
+  ai[key]="loading";redraw();
   try{
-    const r=await api("/api/photo",{kind,vue:key==="dos"?"dos":"face",mannequin:kind==="porte"?key.slice(6):null,taille:lastLabel.taille||null,type:$("#t").value||null,image:await b64(src.blob)});
-    ai[key]={url:"data:"+r.mime+";base64,"+r.data};
-  }catch(e){ai[key]=null;setStatus(errMsg(e,"La photo studio n'a pas pu être générée. L'aperçu reste affiché."),true)}
-  key.startsWith("porte")?renderPorte():renderGallery();
+    const body={kind,vue:key==="dos"?"dos":"face",mannequin:kind==="porte"?key.slice(6):null,taille:lastLabel.taille||null,type:$("#t").value||null,couleur:lastLabel.couleur||null,matieres:lastLabel.matieres||null,image:await b64(src.blob)};
+    if(fix){body.fix=true;body.previous=await toJpegB64(prev.url)}
+    const r=await api("/api/photo",body);
+    ai[key]={url:"data:"+r.mime+";base64,"+r.data,fixed:!!fix};addSpend(r.cost);
+    if(fix)toast("Photo corrigée");
+  }catch(e){ai[key]=fix?prev:null;setStatus(errMsg(e,fix?"La correction n'a pas pu être faite. L'ancienne photo reste affichée.":"La photo studio n'a pas pu être générée. L'aperçu reste affiché."),true)}
+  redraw();
 }
 function genStudio(){["face","dos","porte-"+mannequin].forEach(k=>{if(k!=="dos"||photos.dos)genShot(k)})}
 function errMsg(e,fallback){
@@ -594,8 +636,8 @@ async function analyse(){
     add(photos.face,"photo de face");add(photos.dos,"photo de dos");
     photos.details.forEach((p,i)=>add(p,"détail "+(i+1)));
     const ad=await sample.json(AD_PROMPT.replace("IMAGES_ORDER",order.map((o,i)=>(i+1)+") "+o).join(", ")).replace("LABEL_JSON",JSON.stringify(label)),{images:imgs,modelTier:"default"});
-    lastLabel=label;const res={...ad,...label};
-    renderAd(res,false);
+    lastLabel={...label,couleur:pick(ad,"couleur")};const res={...ad,...label};
+    renderAd(res,false);adMade=true;
     const m=pick(ad,"mannequin")||({fille:"fille",garcon:"garcon",homme:"homme",femme:"femme"})[label.rayon];
     if(m&&BODIES[m]){mannequin=m;syncSeg("#seg","m",m)}
     for(const k in ai)delete ai[k];bumpCount();genStudio();
@@ -618,11 +660,18 @@ $("#copyT").onclick=()=>copy($("#t").value,"Titre copié");
 $("#copyD").onclick=()=>copy($("#d").value,"Description copiée");
 $("#go").onclick=analyse;
 $("#regen").onclick=()=>{if(!photos.face){toast("Ajoutez d'abord la photo de face");return}genStudio()};
-$("#reset").onclick=()=>{for(const k in ai)delete ai[k];lastLabel={};photos.face=photos.dos=null;photos.etiquette=[];photos.details=[];cutCache.clear();renderSlots();renderGallery();renderAd(EXAMPLE,true);setStatus("")};
+let adMade=false;
+function newAd(){
+  const busy=photos.face||photos.dos||photos.etiquette.length||photos.details.length;
+  if(busy&&adMade&&!confirm("Commencer une nouvelle annonce ? L'annonce et les photos en cours seront effacées."))return;
+  for(const k in ai)delete ai[k];lastLabel={};adMade=false;photos.face=photos.dos=null;photos.etiquette=[];photos.details=[];cutCache.clear();
+  renderSlots();renderGallery();renderAd(EXAMPLE,true);setStatus("");window.scrollTo({top:0,behavior:"smooth"});
+}
+$("#reset").onclick=newAd;$("#newAd").onclick=newAd;
 $("#seg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;mannequin=b.dataset.m;syncSeg("#seg","m",mannequin);renderPorte()});
 $("#zone").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;zone=b.dataset.z;syncSeg("#zone","z",zone);renderPorte()});
 
-renderSlots();renderQuota();renderAd(EXAMPLE,true);renderGallery();
+renderSlots();renderQuota();renderSpend();renderAd(EXAMPLE,true);renderGallery();
 /* bottom nav follows the section in view */
 try{const links=[...document.querySelectorAll(".nav a")];const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+en.target.id))})},{rootMargin:"-45% 0px -50% 0px"});
   ["photos","etiquette","studio","annonce"].forEach(id=>io.observe(document.getElementById(id)))}catch(e){}

@@ -1,6 +1,6 @@
 // Minimal service worker: makes Studio Fripe installable on the phone home screen
 // and keeps the app shell available offline. API calls always go to the network.
-const CACHE = "studio-fripe-v2"
+const CACHE = "studio-fripe-v5"
 const SHELL = ["/", "/index.html", "/icon.svg", "/manifest.webmanifest"]
 
 self.addEventListener("install", (e) => {
