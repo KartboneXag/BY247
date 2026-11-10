@@ -160,4 +160,27 @@ r = await call(annonce, {}, julie.code)
 assert.equal(r.body.code, "no_credit")
 console.log("✓ crédits épuisés : de nouveau bloqué")
 
+// 14. Vendeur illimité défini côté serveur (empreinte dans VENDEURS_ILLIMITES)
+const OWNER = "SF-TEST-ILLI-MITE-0001"
+const h = (await import("node:crypto")).createHash("sha256").update(OWNER).digest("hex").slice(0, 32)
+env.VENDEURS_ILLIMITES = `${h}=noircime@gmail.com`
+r = await call(access, {}, OWNER.toLowerCase())
+assert.deepEqual([r.status, r.body.illimite, r.body.nom, r.body.credits], [200, true, "noircime@gmail.com", null])
+for (let i = 0; i < 3; i++) assert.equal((await call(annonce, {}, OWNER)).status, 200)
+reply = () => ({ candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: "x" } }] } }] })
+assert.equal((await call(photo, { kind: "cintre", vue: "face", image: IMG }, OWNER)).status, 200)
+let st = await call(admin, { action: "etat" }, "patron-247")
+let me = st.body.vendeurs.find((v) => v.id === h)
+assert.deepEqual([me.illimite, me.credits, me.annonces, me.photosFaites, me.code], [true, 0, 3, 1, "privé"])
+// l'admin web ne peut pas retirer l'illimité, et le navigateur ne peut pas se l'accorder
+await call(admin, { action: "crediter", id: h, illimite: false, credits: 0 }, "patron-247")
+assert.equal((await call(access, {}, OWNER)).body.illimite, true)
+await call(admin, { action: "crediter", id: marc.id, illimite: true }, "patron-247")
+assert.equal((await call(access, {}, marc.code)).body.illimite, false)
+assert.equal((await call(annonce, {}, marc.code)).body.code, "no_credit")
+// retiré de la variable serveur → redevient un vendeur normal à 0
+env.VENDEURS_ILLIMITES = ""
+assert.equal((await call(annonce, {}, OWNER)).body.code, "no_credit")
+console.log("✓ illimité : fixé côté serveur, jamais décompté, stats suivies, non modifiable via l'admin ou le navigateur")
+
 console.log("\nTous les tests serveur passent.")

@@ -31,6 +31,7 @@ export type Vendeur = {
   photosFaites: number
   cree: string
   dernier?: string
+  illimite?: boolean  // fixé uniquement par le serveur (variable VENDEURS_ILLIMITES), jamais par une requête
 }
 export type Who = { admin: true; id: "admin"; nom: string } | ({ admin: false } & Vendeur)
 
@@ -56,15 +57,37 @@ export function newCode() {
   return `SF-${s.slice(0, 4)}-${s.slice(4)}`
 }
 
+/** Vendeurs illimités : VENDEURS_ILLIMITES = "empreinte=Nom;empreinte2=Nom2".
+ *  Seule l'empreinte SHA-256 du code est stockée : le code lui-même n'est écrit nulle part côté serveur. */
+function illimites(): Map<string, string> {
+  const m = new Map<string, string>()
+  for (const part of (Netlify.env.get("VENDEURS_ILLIMITES") || "").split(";")) {
+    const [id, ...nom] = part.split("=")
+    if (/^[0-9a-f]{32}$/.test(id?.trim() || "")) m.set(id.trim(), nom.join("=").trim() || "Illimité")
+  }
+  return m
+}
+function withLimits(v: Vendeur): Vendeur {
+  const nom = illimites().get(v.id)
+  return nom ? { ...v, illimite: true, nom } : { ...v, illimite: false }
+}
+
 /** Identifie l'appelant à partir de l'en-tête x-access-code. */
 export async function whoIs(req: Request): Promise<Who> {
   const sent = (req.headers.get("x-access-code") || "").trim()
   if (!sent) throw new ApiError("bad_code", "Code d'accès manquant.", 401)
   const admin = (Netlify.env.get("ADMIN_CODE") || "").trim()
   if (admin && sameText(sent.toUpperCase(), admin.toUpperCase())) return { admin: true, id: "admin", nom: "Admin" }
-  const v = (await db().get("vendeurs/" + (await sha(sent)), { type: "json" })) as Vendeur | null
+  const id = await sha(sent)
+  let v = (await db().get("vendeurs/" + id, { type: "json" })) as Vendeur | null
+  const nomIllimite = illimites().get(id)
+  if (!v && nomIllimite) {
+    // Premier passage d'un vendeur illimité : on crée sa fiche (sans jamais stocker son code).
+    v = { id, code: "privé", nom: nomIllimite, credits: 0, photosIA: 0, annonces: 0, photosFaites: 0, cree: new Date().toISOString() }
+    await db().setJSON("vendeurs/" + id, v, { onlyIfNew: true })
+  }
   if (!v) throw new ApiError("bad_code", "Code d'accès incorrect.", 401)
-  return { admin: false, ...v }
+  return { admin: false, ...withLimits(v) }
 }
 
 export async function requireAdmin(req: Request) {
@@ -88,7 +111,8 @@ async function update<T>(key: string, fn: (cur: T) => T): Promise<T> {
 export function publicVendeur(v: Vendeur | Who) {
   if ((v as Who).admin) return { admin: true, nom: "Admin", credits: null, photosIA: null }
   const x = v as Vendeur
-  return { admin: false, nom: x.nom, credits: x.credits, photosIA: x.photosIA, annonces: x.annonces }
+  if (x.illimite) return { admin: false, illimite: true, nom: x.nom, credits: null, photosIA: null, annonces: x.annonces }
+  return { admin: false, illimite: false, nom: x.nom, credits: x.credits, photosIA: x.photosIA, annonces: x.annonces }
 }
 
 /* ---------- vendeurs (admin) ---------- */
@@ -103,17 +127,19 @@ export async function createVendeur(nom: string) {
 export async function listVendeurs(): Promise<Vendeur[]> {
   const { blobs } = await db().list({ prefix: "vendeurs/" })
   const all = await Promise.all(blobs.map((b) => db().get(b.key, { type: "json" })))
-  return (all.filter(Boolean) as Vendeur[]).sort((a, b) => a.cree.localeCompare(b.cree))
+  return (all.filter(Boolean) as Vendeur[]).map(withLimits).sort((a, b) => a.cree.localeCompare(b.cree))
 }
 
 export async function setVendeur(id: string, patch: { credits?: number; photosIA?: number; nom?: string; addCredits?: number; addPhotos?: number }) {
   const n = (x: unknown) => Math.max(0, Math.min(10000, Math.floor(Number(x) || 0)))
-  return update<Vendeur>("vendeurs/" + id, (v) => ({
+  const out = await update<Vendeur>("vendeurs/" + id, (v) => ({
     ...v,
+    illimite: undefined, // jamais modifiable par l'admin web : seule la variable serveur compte
     nom: typeof patch.nom === "string" && patch.nom.trim() ? patch.nom.trim().slice(0, 60) : v.nom,
     credits: patch.credits != null ? n(patch.credits) : n(v.credits + (Number(patch.addCredits) || 0)),
     photosIA: patch.photosIA != null ? n(patch.photosIA) : n(v.photosIA + (Number(patch.addPhotos) || 0)),
   }))
+  return withLimits(out)
 }
 
 export async function deleteVendeur(id: string) {
@@ -126,7 +152,10 @@ type Ticket = { id: string; vendeur: string; exp: number; calls: number }
 /** Démarre une annonce : consomme 1 crédit et renvoie un ticket. */
 export async function startAnnonce(w: Who) {
   let restant: number | null = null
-  if (!w.admin) {
+  if (!w.admin && w.illimite) {
+    // Illimité : rien n'est décompté, on garde seulement les statistiques d'usage.
+    await update<Vendeur>("vendeurs/" + w.id, (cur) => ({ ...cur, annonces: cur.annonces + 1, dernier: new Date().toISOString() }))
+  } else if (!w.admin) {
     const v = await update<Vendeur>("vendeurs/" + w.id, (cur) => {
       if (cur.credits <= 0) throw new ApiError("no_credit", "Plus d'annonce disponible. Demandez des crédits à l'administrateur.", 402)
       return { ...cur, credits: cur.credits - 1, annonces: cur.annonces + 1, dernier: new Date().toISOString() }
@@ -156,6 +185,10 @@ export async function useTicket(req: Request, w: Who) {
 /* ---------- photos IA ---------- */
 export async function takePhotoCredit(w: Who) {
   if (w.admin) return null
+  if (w.illimite) {
+    await update<Vendeur>("vendeurs/" + w.id, (cur) => ({ ...cur, photosFaites: cur.photosFaites + 1 }))
+    return null
+  }
   const v = await update<Vendeur>("vendeurs/" + w.id, (cur) => {
     if (cur.photosIA <= 0) throw new ApiError("no_photo_credit", "Plus de photo studio IA disponible. Demandez-en à l'administrateur.", 402)
     return { ...cur, photosIA: cur.photosIA - 1, photosFaites: cur.photosFaites + 1 }
@@ -164,6 +197,10 @@ export async function takePhotoCredit(w: Who) {
 }
 export async function refundPhotoCredit(w: Who) {
   if (w.admin) return
+  if (w.illimite) {
+    await update<Vendeur>("vendeurs/" + w.id, (cur) => ({ ...cur, photosFaites: Math.max(0, cur.photosFaites - 1) })).catch(() => {})
+    return
+  }
   await update<Vendeur>("vendeurs/" + w.id, (cur) => ({ ...cur, photosIA: cur.photosIA + 1, photosFaites: Math.max(0, cur.photosFaites - 1) })).catch(() => {})
 }
 

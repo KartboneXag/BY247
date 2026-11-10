@@ -371,6 +371,7 @@ const EXAMPLE={
 /* ---------- storage helpers ---------- */
 /* crédits : la vérité est sur le serveur (code vendeur → annonces et photos IA restantes) */
 let profil=null;
+const limited=()=>profil&&!profil.admin&&!profil.illimite;
 const plur=(n,w)=>n+" "+w+(n>1?"s":"");
 function initials(n){return String(n||"SF").split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase()||"SF"}
 function renderQuota(){
@@ -378,6 +379,7 @@ function renderQuota(){
   if(!profil){q.textContent="0";t.textContent="";updateGo();return}
   $("#avTxt").textContent=profil.admin?"XG":initials(profil.nom);
   if(profil.admin){q.textContent="∞";t.innerHTML="Admin · illimité <a class=\"adminlink\" href=\"/admin.html\">Gérer</a>";$("#spend").hidden=false}
+  else if(profil.illimite){q.textContent="∞";t.textContent="Illimité";$("#spend").hidden=false}
   else{q.textContent=Math.min(profil.credits,99);t.textContent=plur(profil.credits,"annonce")+" · "+plur(profil.photosIA,"photo")+" IA"}
   updateGo();
 }
@@ -739,13 +741,13 @@ async function genShot(key,fix){
     if(fix){body.fix=true;body.previous=await toJpegB64(prev.url)}
     const r=await api("/api/photo",body);
     ai[key]={url:"data:"+r.mime+";base64,"+r.data,fixed:!!fix};addSpend(r.cost);
-    if(profil&&!profil.admin&&r.photosIA!=null){profil.photosIA=r.photosIA;renderQuota()}
+    if(limited()&&r.photosIA!=null){profil.photosIA=r.photosIA;renderQuota()}
     if(fix)toast("Photo corrigée");
   }catch(e){ai[key]=fix?prev:null;setStatus(errMsg(e,fix?"La correction n'a pas pu être faite. L'ancienne photo reste affichée.":"La photo studio n'a pas pu être générée. L'aperçu reste affiché."),true)}
   redraw();
 }
 function genStudio(){["face","dos","porte-"+mannequin].forEach(k=>{if(k!=="dos"||photos.dos)genShot(k)})}
-const canPhotoIA=()=>profil&&(profil.admin||profil.photosIA>0);
+const canPhotoIA=()=>profil&&(!limited()||profil.photosIA>0);
 function errMsg(e,fallback){
   const m={no_key:"La clé Gemini n'est pas encore configurée sur le serveur (variable GEMINI_API_KEY dans Netlify).",bad_key:"La clé Gemini est refusée. Vérifiez-la dans Netlify.",network:"Pas de connexion. Vérifiez votre réseau et relancez.",rate_limited:"Trop de demandes d'un coup. Réessayez dans une minute.",quota:"Le quota Gemini est épuisé ou la facturation n'est pas activée sur votre clé.",blocked:"Gemini a refusé cette image. Essayez une autre photo.",invalid_json:"La réponse n'a pas pu être lue. Relancez l'analyse.",too_big:"Photos trop lourdes. Retirez-en une ou deux et relancez.",bad_code:"Code vendeur incorrect ou supprimé.",no_credit:"Plus d’annonce disponible : demandez des crédits.",no_photo_credit:"Plus de photo studio IA disponible : demandez-en.",no_ticket:"Annonce expirée ou incomplète : relancez « Créer l’annonce ».",forbidden:"Réservé à l’administrateur.",busy:"Serveur occupé, réessayez."};
   return m[e&&e.code]||(e&&e.message)||fallback;
@@ -774,7 +776,7 @@ async function vignette(p){
 async function processArticle(ph,step){
   step("Réservation d'une annonce…");
   const st=await api("/api/annonce",{});
-  if(profil&&!profil.admin&&st.credits!=null){profil.credits=st.credits;renderQuota()}
+  if(limited()&&st.credits!=null){profil.credits=st.credits;renderQuota()}
   step("Lecture des étiquettes…");
   const label=await readLabels(ph,st.ticket);
   step("Rédaction de l'annonce…");
@@ -905,7 +907,7 @@ function renderLot(){
 }
 async function runLot(){
   const todo=lot.filter(x=>x.state==="attente"||x.state==="erreur");if(!todo.length)return;
-  if(profil&&!profil.admin&&profil.credits<todo.length){
+  if(limited()&&profil.credits<todo.length){
     if(profil.credits<=0){openAsk(todo.length);return}
     if(!confirm("Il vous reste "+plur(profil.credits,"annonce")+" pour "+plur(todo.length,"article")+". "+(profil.credits>1?"Seuls les "+profil.credits+" premiers seront traités":"Seul le premier sera traité")+". Continuer ?"))return;
   }
@@ -931,14 +933,14 @@ $("#lotRun").onclick=runLot;
 /* ---------- bouton principal ---------- */
 function updateGo(){
   const go=$("#go");if(go.querySelector(".spin"))return;
-  const noCredit=profil&&!profil.admin&&profil.credits<=0;
+  const noCredit=limited()&&profil.credits<=0;
   if(lotMode){go.textContent="Ajouter au lot";go.disabled=!photos.face;return}
   if(noCredit){go.textContent="Demander des annonces";go.disabled=false;return}
   go.textContent="Créer l'annonce";go.disabled=!photos.face;
 }
 function onGo(){
   if(lotMode)return addToLot();
-  if(profil&&!profil.admin&&profil.credits<=0)return openAsk(10);
+  if(limited()&&profil.credits<=0)return openAsk(10);
   analyse();
 }
 function openAsk(n){

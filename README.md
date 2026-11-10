@@ -31,6 +31,7 @@ test/server.test.mjs         tests avec stockage et Gemini simulés : npm test
 |---|---|---|
 | GEMINI_API_KEY | oui | Clé Google AI Studio |
 | ADMIN_CODE | oui | Code administrateur (long et secret) |
+| VENDEURS_ILLIMITES | non | Vendeurs illimités, jamais décomptés : `empreinte=Nom;empreinte2=Nom2` (empreinte = 32 premiers caractères hex du SHA-256 du code en majuscules ; le code lui-même n'est stocké nulle part) |
 | GEMINI_TEXT_MODEL | non | défaut gemini-3.6-flash |
 | GEMINI_IMAGE_MODEL | non | défaut gemini-3.1-flash-image |
 

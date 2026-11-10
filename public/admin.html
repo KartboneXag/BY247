@@ -33,6 +33,7 @@ input{font:16px var(--sans);color:var(--ink);background:var(--base);border:1px s
 .zero{color:var(--warn)}
 .ctl{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
 .dem{border-left:4px solid var(--rust)}
+.illi{font:700 12px var(--mono);text-transform:uppercase;letter-spacing:.6px;color:#fff;background:var(--ok);padding:3px 9px;border-radius:20px}
 .gate{max-width:360px;margin:15vh auto 0;display:flex;flex-direction:column;gap:12px;text-align:center}
 .msg{color:var(--warn);font-weight:600;min-height:20px;font-size:14px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--base);padding:10px 16px;border-radius:30px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -109,10 +110,11 @@ async function load(){
   if(!st.vendeurs.length)V.innerHTML='<p class="empty">Aucun vendeur pour l’instant.</p>';
   st.vendeurs.forEach(v=>{
     const c=el(`<div class="card v"><div><div class="nom">${esc(v.nom)}</div><div class="row"><span class="code" title="Cliquer pour copier">${esc(v.code)}</span><span class="k">créé ${d(v.cree)} · dernière annonce ${d(v.dernier)}</span></div></div>
-      <div class="nums"><span><b class="${v.credits?"":"zero"}">${v.credits}</b> annonces</span><span><b class="${v.photosIA?"":"zero"}">${v.photosIA}</b> photos IA</span></div>
+      <div class="nums">${v.illimite?'<span class="illi" title="Fixé côté serveur (VENDEURS_ILLIMITES)">Illimité</span>':`<span><b class="${v.credits?"":"zero"}">${v.credits}</b> annonces</span><span><b class="${v.photosIA?"":"zero"}">${v.photosIA}</b> photos IA</span>`}</div>
       <div class="k" style="grid-column:1/-1">Utilisé : ${plur(v.annonces,"annonce")}, ${plur(v.photosFaites,"photo")} IA</div>
       <div class="ctl"><button class="btn sm" data-c="5">+5 annonces</button><button class="btn sm" data-c="10">+10</button><button class="btn ghost sm" data-p="3">+3 photos IA</button>
       <button class="btn ghost sm" data-a="zero">Remettre à 0</button><button class="btn ghost sm" data-a="hist">Annonces</button><button class="btn ghost sm" data-a="del">Supprimer</button></div></div>`);
+    if(v.illimite)c.querySelectorAll("[data-c],[data-p],[data-a=zero]").forEach(b=>b.remove());
     c.querySelector(".code").onclick=async()=>{try{await navigator.clipboard.writeText(v.code);toast("Code copié")}catch(e){toast(v.code)}};
     const upd=async b=>{try{await api({action:"crediter",id:v.id,...b});load()}catch(e){toast(e.message)}};
     c.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>upd({addCredits:+b.dataset.c}));
